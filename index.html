@@ -3927,30 +3927,40 @@
     triggerHaptic(40, "action");
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch(`${serverBaseUrl}/api/upload`, {
-        method: "POST",
-        body: formData
-      });
-      const data = await res.json();
-      if (data.status === "uploaded" || res.ok) {
-        triggerToast("✅ Salvat pe Desktop-ul PC-ului!");
-        // Anunță și în chat cu thumbnail preview
-        const chatInput = document.getElementById("chatInput");
-        const userPrompt = chatInput ? chatInput.value.trim() : "";
-        if (chatInput) chatInput.value = "";
-        
-        const fileMsg = userPrompt 
-          ? `[📷 Fișier atașat: ${file.name}] ${userPrompt}` 
-          : ` Master, ți-am trimis poza "${file.name}" pe Desktop! Aruncă o privire peste ea!`;
-        
-        quickSend(fileMsg);
-      } else {
-        triggerToast("Eroare încărcare: " + (data.error || "Fișier blocat"));
-      }
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64Content = reader.result;
+          const res = await fetch(`${serverBaseUrl}/api/upload`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              filename: file.name,
+              content: base64Content
+            })
+          });
+          const data = await res.json();
+          if (data.status === "ok" || res.ok) {
+            triggerToast("✅ Salvat pe PC în Sanctuar!");
+            const chatInput = document.getElementById("chatInput");
+            const userPrompt = chatInput ? chatInput.value.trim() : "";
+            if (chatInput) chatInput.value = "";
+            
+            const fileMsg = userPrompt 
+              ? `[📷 Poza atașată: ${file.name}] ${userPrompt}` 
+              : ` Master, ți-am trimis poza "${file.name}" pe PC! Deschide-o te rog pe ecranul mare!`;
+            
+            quickSend(fileMsg);
+          } else {
+            triggerToast("Eroare încărcare: " + (data.error || "Fișier blocat"));
+          }
+        } catch(err) {
+          triggerToast("Eroare trimitere fișier");
+        }
+      };
+      reader.readAsDataURL(file);
     } catch(e) {
-      triggerToast("Eroare de rețea la încărcare pe PC");
+      triggerToast("Eroare citire fișier local");
     }
   }
 
