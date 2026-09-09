@@ -1308,6 +1308,28 @@
         </div>
       </div>
 
+      <!-- Photo Preview Dock Bar (Apare când alegi o poză, înainte de trimitere) -->
+      <div id="attachmentPreviewBar" style="display:none; background:rgba(10, 15, 32, 0.95); border:1.5px solid rgba(0, 242, 254, 0.5); border-radius:12px; margin:0 8px 6px 8px; padding:8px 12px; backdrop-filter:blur(16px); align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(0, 242, 254, 0.25); animation: nodeSpawn 0.25s ease;">
+        <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
+          <div style="position:relative; width:44px; height:44px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.3); flex-shrink:0;">
+            <img id="attachPreviewImg" src="" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+          <div style="overflow:hidden;">
+            <div style="font-size:9.5px; font-weight:900; color:var(--neon-cyan); letter-spacing:0.5px; text-transform:uppercase;">📷 PREVIZUALIZARE POZĂ</div>
+            <div id="attachPreviewName" style="font-size:11px; color:#fff; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">imagine.jpg</div>
+            <div style="font-size:9px; color:var(--neon-emerald); font-weight:800;">Gata de trimitere către PC & Kitty AI ✓</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" class="btn-3d btn-3d-cyan" style="padding:6px 12px; font-size:10.5px; font-weight:900;" onclick="confirmAndUploadAttachment()">
+            🚀 TRIMITE
+          </button>
+          <button type="button" class="btn-3d-chip" style="border-radius:50%; width:28px; height:28px; padding:0; justify-content:center; color:#ef4444; border-color:#ef4444;" onclick="cancelAttachmentPreview()">
+            ✕
+          </button>
+        </div>
+      </div>
+
       <form class="chat-dock-3d" onsubmit="event.preventDefault(); sendChatMessage(); return false;">
         <button type="button" class="btn-voice-rec" id="btnVoiceMic" onclick="toggleVoiceDictation()" title="Comandă Vocală">🎙️</button>
         <button type="button" class="btn-upload-phone" id="btnUploadFile" onclick="triggerMobileFileUpload()" title="Trimite Poză / Fișier pe PC">📷</button>
@@ -3844,6 +3866,91 @@
       triggerToast("✅ " + (data.output || "Comandă executată"));
     } catch(e) {
       triggerToast("Eroare execuție comandă");
+    }
+  }
+
+  // ================= MOBILE PHOTO PREVIEW & UPLOAD ENGINE =================
+  let pendingSelectedFile = null;
+
+  function triggerMobileFileUpload() {
+    triggerHaptic(30);
+    const input = document.getElementById("mobileUploadInput");
+    if (input) input.click();
+  }
+
+  function handleMobileFileUpload(inputElem) {
+    if (!inputElem || !inputElem.files || !inputElem.files[0]) return;
+    const file = inputElem.files[0];
+    pendingSelectedFile = file;
+
+    const previewBar = document.getElementById("attachmentPreviewBar");
+    const previewImg = document.getElementById("attachPreviewImg");
+    const previewName = document.getElementById("attachPreviewName");
+
+    if (previewName) previewName.textContent = file.name || "Imagine selectată";
+
+    // Dacă este imagine, generează previzualizarea instant locală în bara de review
+    if (file.type && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (previewImg) previewImg.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (previewImg) previewImg.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'></path><polyline points='14 2 14 8 20 8'></polyline></svg>";
+    }
+
+    if (previewBar) previewBar.style.display = "flex";
+    triggerToast("📸 Poză încărcată în previzualizare! Apasă 🚀 TRIMITE.");
+    triggerHaptic(35);
+  }
+
+  function cancelAttachmentPreview() {
+    triggerHaptic(20);
+    pendingSelectedFile = null;
+    const previewBar = document.getElementById("attachmentPreviewBar");
+    if (previewBar) previewBar.style.display = "none";
+    const input = document.getElementById("mobileUploadInput");
+    if (input) input.value = "";
+    triggerToast("Anulat");
+  }
+
+  async function confirmAndUploadAttachment() {
+    if (!pendingSelectedFile) {
+      triggerToast("⚠️ Niciun fișier selectat!");
+      return;
+    }
+    const file = pendingSelectedFile;
+    cancelAttachmentPreview();
+
+    triggerToast(`⏳ Se trimite pe PC: ${file.name}...`);
+    triggerHaptic(40, "action");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${serverBaseUrl}/api/upload`, {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (data.status === "uploaded" || res.ok) {
+        triggerToast("✅ Salvat pe Desktop-ul PC-ului!");
+        // Anunță și în chat cu thumbnail preview
+        const chatInput = document.getElementById("chatInput");
+        const userPrompt = chatInput ? chatInput.value.trim() : "";
+        if (chatInput) chatInput.value = "";
+        
+        const fileMsg = userPrompt 
+          ? `[📷 Fișier atașat: ${file.name}] ${userPrompt}` 
+          : ` Master, ți-am trimis poza "${file.name}" pe Desktop! Aruncă o privire peste ea!`;
+        
+        quickSend(fileMsg);
+      } else {
+        triggerToast("Eroare încărcare: " + (data.error || "Fișier blocat"));
+      }
+    } catch(e) {
+      triggerToast("Eroare de rețea la încărcare pe PC");
     }
   }
 
