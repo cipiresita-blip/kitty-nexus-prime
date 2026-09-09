@@ -693,6 +693,29 @@
     box-shadow: 0 0 20px rgba(245, 158, 11, 0.8) !important;
     animation: micPulseAnim 0.7s infinite ease-in-out !important;
   }
+  .btn-upload-phone {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.6) 100%);
+    border: 1.5px solid #10b981;
+    font-size: 20px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  }
+  .btn-upload-phone:active {
+    transform: scale(0.90);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.8) !important;
+  }
   @keyframes micPulseAnim {
     0% { transform: scale(1); }
     50% { transform: scale(1.16); }
@@ -1238,8 +1261,8 @@
 
       <form class="chat-dock-3d" onsubmit="event.preventDefault(); sendChatMessage(); return false;">
         <button type="button" class="btn-voice-rec" id="btnVoiceMic" onclick="toggleVoiceDictation()" title="Comandă Vocală">🎙️</button>
-        <button type="button" class="btn-voice-rec" id="btnUploadFile" onclick="triggerMobileFileUpload()" title="Trimite Fișiere pe PC" style="background:linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.4)); border-color:#34d399; font-size:15px;">📎</button>
-        <input type="file" id="mobileUploadInput" style="display:none;" onchange="handleMobileFileUpload(this)">
+        <button type="button" class="btn-upload-phone" id="btnUploadFile" onclick="triggerMobileFileUpload()" title="Trimite Poză / Fișier pe PC">📷</button>
+        <input type="file" id="mobileUploadInput" style="display:none;" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt" onchange="handleMobileFileUpload(this)">
         <input type="file" id="audioFallbackInput" accept="audio/*" capture="microphone" style="display:none;" onchange="handleAudioFallbackFile(this)">
         <input type="text" id="chatInput" class="input-matrix-field" placeholder="Scrie mesajul sau apasă pe microfon..." autocomplete="off" enterkeyhint="send" onkeydown="if(event.key==='Enter'||event.keyCode===13){event.preventDefault();sendChatMessage();}">
         <button type="button" class="btn-3d btn-3d-cyan btn-3d-send" onclick="sendChatMessage()" title="Trimite comanda">➤</button>
