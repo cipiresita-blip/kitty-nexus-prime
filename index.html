@@ -1380,21 +1380,48 @@
 
   
     <!-- VIEW 5: DEDICATED CHATGPT TAB (LOGAT SEPARAT) -->
-    <div id="viewChatGPT" class="view-deck" style="padding:0; overflow:hidden; position:relative; flex-direction:column;">
-      <div style="height:42px; min-height:42px; background:rgba(10, 15, 32, 0.96); border-bottom:1px solid rgba(16, 185, 129, 0.4); display:flex; align-items:center; justify-content:space-between; padding:0 12px; z-index:10; flex-shrink:0;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:17px;">🟢</span>
-          <div>
-            <div style="font-size:11px; font-weight:900; color:#10b981; letter-spacing:0.4px;">CHATGPT PRO // OPENAI DIRECT</div>
-            <div style="font-size:8.5px; color:#94a3b8; font-weight:700;">CONTUL TĂU LOGAT // ACCES TOTAL</div>
+    <div id="viewChatGPT" class="view-deck" style="padding:16px; overflow-y:auto; position:relative; flex-direction:column; gap:14px; background:radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.15), transparent 70%), #05070f;">
+      <div style="background:rgba(14, 20, 40, 0.85); border:1px solid rgba(16, 185, 129, 0.4); border-radius:18px; padding:22px 16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px;">
+        <div style="width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; font-size:34px; box-shadow:0 0 30px rgba(16, 185, 129, 0.6); border:2px solid rgba(255,255,255,0.2);">
+          🤖
+        </div>
+        <div>
+          <div style="font-size:16px; font-weight:900; color:#10b981; letter-spacing:0.5px; text-transform:uppercase;">
+            CHATGPT PRO // ACCES LOGAT
+          </div>
+          <div style="font-size:10.5px; color:#38bdf8; font-weight:700; margin-top:3px;">
+            SESIUNEA TA OFICIALĂ OPENAI
           </div>
         </div>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-3d btn-3d-emerald" style="padding:4px 9px; font-size:9.5px;" onclick="openExternalChatGPT()">↗️ DESCHIDE TAB</button>
-          <button class="btn-3d btn-3d-cyan" style="padding:4px 9px; font-size:9.5px;" onclick="reloadGptFrame()">🔄 REÎNCARCĂ</button>
+        <div style="font-size:12px; color:#cbd5e1; line-height:1.5; max-width:320px;">
+          OpenAI blochează încărcarea directă în fereastră integrată din motive de securitate a contului.
+          Apasă butonul de mai jos pentru a deschide <b>ChatGPT direct cu contul tău logat</b>!
         </div>
+        
+        <button class="btn-3d btn-3d-emerald" style="width:100%; max-width:290px; padding:14px 18px; font-size:13.5px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:10px; border-radius:12px; cursor:pointer;" onclick="openExternalChatGPT()">
+          <span style="font-size:18px;">🚀</span>
+          <span>DESCHIDE CHATGPT ACUM</span>
+        </button>
       </div>
-      <iframe id="gptFrame" src="about:blank" style="width:100%; flex:1; border:none; background:#0f172a;" allow="clipboard-read; clipboard-write; microphone"></iframe>
+
+      <!-- DIRECT QUICK PROMPT CHATGPT / DUAL BRAIN -->
+      <div style="background:rgba(14, 20, 40, 0.85); border:1px solid rgba(56, 189, 248, 0.35); border-radius:18px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:7px;">
+            <span style="font-size:17px;">⚡</span>
+            <span style="font-size:12px; font-weight:900; color:#38bdf8;">KITTY DIRECT AI ENGINE</span>
+          </div>
+          <span style="font-size:9.5px; background:rgba(16, 185, 129, 0.2); color:#10b981; padding:3px 8px; border-radius:10px; font-weight:800; border:1px solid rgba(16, 185, 129, 0.4);">DUAL BRAIN ACTIV</span>
+        </div>
+        <div style="font-size:11px; color:#94a3b8; line-height:1.4;">
+          Scrie orice comandă direct aici — Kitty o transmite instant către nucleul AI:
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input id="gptDirectInput" type="text" placeholder="Scrie comanda pentru AI..." style="flex:1; background:rgba(5, 7, 15, 0.85); border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:11px 12px; font-size:12px; color:#fff; outline:none;" onkeydown="if(event.key==='Enter') sendGptDirect()">
+          <button class="btn-3d btn-3d-cyan" style="padding:0 16px; font-size:12px; font-weight:800;" onclick="sendGptDirect()">TRIMITE</button>
+        </div>
+        <div id="gptDirectResponse" style="min-height:75px; max-height:180px; overflow-y:auto; background:rgba(5, 7, 15, 0.65); border:1px dashed rgba(255,255,255,0.15); border-radius:10px; padding:12px; font-size:11.5px; color:#e2e8f0; line-height:1.45; white-space:pre-wrap;">Răspunsurile instant vor apărea aici...</div>
+      </div>
     </div>
 
   </main>
@@ -3372,6 +3399,36 @@
     if (frame) {
       frame.src = CHATGPT_WEB_URL;
       triggerToast("🔄 Reîncărcare ChatGPT...");
+    }
+  }
+
+    async function sendGptDirect() {
+    const input = document.getElementById("gptDirectInput");
+    const out = document.getElementById("gptDirectResponse");
+    if (!input || !out) return;
+    const q = input.value.trim();
+    if (!q) return;
+    triggerHaptic(30);
+    out.innerHTML = "<span style='color:#38bdf8;'>⏳ Kitty procesează cu AI Engine...</span>";
+    input.value = "";
+    
+    try {
+      const resp = await fetch(`${serverBaseUrl}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: q, mode: "openai" })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        out.textContent = data.reply || data.response || "Comandă executată cu succes!";
+      } else {
+        out.textContent = "Comanda a fost transmisă către Kitty pe Chat Live!";
+        appendChatMessage("user", q);
+        sendQueryToServer(q);
+      }
+    } catch(err) {
+      out.textContent = "Comandă redirecționată către Kitty pe Chat Live.";
+      sendQueryToServer(q);
     }
   }
 
