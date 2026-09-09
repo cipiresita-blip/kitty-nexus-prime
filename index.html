@@ -380,19 +380,19 @@
     height: 38px;
     min-width: 38px;
     border-radius: 12px;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(139, 92, 246, 0.25) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(139, 92, 246, 0.4) 50%, rgba(244, 63, 94, 0.3) 100%);
+    border: 1.5px solid rgba(0, 242, 254, 0.6);
+    box-shadow: 0 0 18px rgba(0, 242, 254, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
+    font-size: 20px;
     position: relative;
-    animation: reactorGlow 3.5s ease-in-out infinite alternate;
+    animation: reactorGlow 3s ease-in-out infinite alternate;
   }
   @keyframes reactorGlow {
-    0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4); transform: scale(1); }
-    100% { box-shadow: 0 0 22px rgba(0, 242, 254, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.8); transform: scale(1.02); }
+    0% { box-shadow: 0 0 12px rgba(0, 242, 254, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.5); transform: scale(1); }
+    100% { box-shadow: 0 0 24px rgba(168, 85, 247, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.9); transform: scale(1.04); }
   }
 
   .hud-titles {
@@ -404,8 +404,8 @@
   .hud-main-title {
     font-size: 14px;
     font-weight: 900;
-    letter-spacing: 0.6px;
-    background: linear-gradient(90deg, #ffffff 0%, #38bdf8 55%, #c084fc 100%);
+    letter-spacing: 0.8px;
+    background: linear-gradient(90deg, #00f2fe 0%, #38bdf8 45%, #c084fc 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
@@ -413,15 +413,16 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.4));
   }
   .hud-sub-title {
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 800;
-    color: var(--neon-gold);
-    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
     text-transform: uppercase;
-    letter-spacing: 0.9px;
-    margin-top: 1px;
+    letter-spacing: 1.2px;
+    margin-top: 1.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1234,10 +1235,17 @@
   <!-- Cyber HUD Top Bar -->
   <header class="cyber-hud-header">
     <div class="hud-brand" onclick="forceOtaSync()" title="Apasă pentru Sincronizare OTA Live cu PC" style="cursor:pointer;">
-      <div class="hud-core-reactor">👑</div>
+      <div class="hud-core-reactor" style="background:linear-gradient(135deg, rgba(0,242,254,0.3) 0%, rgba(139,92,246,0.4) 100%); border-color:#00f2fe; box-shadow:0 0 16px rgba(0,242,254,0.6);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px #00f2fe);">
+          <circle cx="12" cy="12" r="9" stroke="#00f2fe" stroke-width="1.8" stroke-dasharray="3 2"/>
+          <path d="M12 4L15 10H9L12 4Z" fill="#38bdf8"/>
+          <circle cx="12" cy="14" r="2.5" fill="#c084fc"/>
+          <path d="M7 19C9 17 15 17 17 19" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div class="hud-titles">
-        <div class="hud-main-title">ZENESIS PRIME</div>
-        <div class="hud-sub-title">MASTER NIKOLAS 2026</div>
+        <div class="hud-main-title" style="letter-spacing:1px; font-size:13.5px;">ANTI GRAVITY</div>
+        <div class="hud-sub-title" style="color:#a855f7; letter-spacing:1.5px; font-size:9.5px;">ZENESIS 2026</div>
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:5px;">
