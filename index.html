@@ -1627,7 +1627,7 @@
   function openInboxMobil() {
     triggerHaptic(30);
     triggerToast("📥 Deschidere Dosar Uploads Telefon...");
-    openDirectory("C:\\Users\\User\\Desktop\\uploads de pe telefon");
+    openDirectory("C:\\Users\\User\\Desktop\\antigravity kitty casa\\uploads");
     switchDock("viewExplorer", document.getElementById("dockBtnExplorer"));
   }
 
@@ -1661,14 +1661,14 @@
           body: JSON.stringify({
             filename: file.name,
             content: base64Data,
-            target_dir: "C:\\Users\\User\\Desktop\\uploads de pe telefon"
+            target_dir: "C:\\Users\\User\\Desktop\\antigravity kitty casa\\uploads"
           })
         });
 
         if (resp.ok) {
           const resJson = await resp.json();
           triggerHaptic(80, "success");
-          triggerToast(`✅ '${file.name}' a fost salvat pe Desktop-ul PC!`);
+          triggerToast(`✅ '${file.name}' a fost salvat în Casa Kitty!`);
           
           // If image, add visual preview directly in chat
           if (file.type && file.type.startsWith("image/")) {
@@ -1676,7 +1676,7 @@
               id: `preview-${Date.now()}`,
               sender: "kitty",
               name: "Kitty Elena (Zenesis 2026)",
-              text: `🖼️ **Previzualizare Poză Primită:**\n<div style="margin-top:8px; border-radius:12px; overflow:hidden; border:1.5px solid rgba(16,185,129,0.5); max-width:280px; box-shadow:0 6px 20px rgba(0,0,0,0.5);"><img src="${base64Data}" style="width:100%; display:block; border-radius:10px;"></div>\n📁 *Salvat pe PC la:* \`Desktop\\uploads de pe telefon\\${file.name}\``,
+              text: `🖼️ **Previzualizare Poză Primită:**\n<div style="margin-top:8px; border-radius:12px; overflow:hidden; border:1.5px solid rgba(16,185,129,0.5); max-width:280px; box-shadow:0 6px 20px rgba(0,0,0,0.5);"><img src="${base64Data}" style="width:100%; display:block; border-radius:10px;"></div>\n📁 *Salvat în Casa Kitty la:* \`antigravity kitty casa\\uploads\\${file.name}\``,
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
             renderSingleMessage(previewMsg, true);
