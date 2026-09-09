@@ -1667,12 +1667,24 @@
 
         if (resp.ok) {
           const resJson = await resp.json();
-          triggerHaptic(80);
+          triggerHaptic(80, "success");
           triggerToast(`✅ '${file.name}' a fost salvat pe Desktop-ul PC!`);
           
+          // If image, add visual preview directly in chat
+          if (file.type && file.type.startsWith("image/")) {
+            const previewMsg = {
+              id: `preview-${Date.now()}`,
+              sender: "kitty",
+              name: "Kitty Elena (Zenesis 2026)",
+              text: `🖼️ **Previzualizare Poză Primită:**\n<div style="margin-top:8px; border-radius:12px; overflow:hidden; border:1.5px solid rgba(16,185,129,0.5); max-width:280px; box-shadow:0 6px 20px rgba(0,0,0,0.5);"><img src="${base64Data}" style="width:100%; display:block; border-radius:10px;"></div>\n📁 *Salvat pe PC la:* \`Desktop\\uploads de pe telefon\\${file.name}\``,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            renderSingleMessage(previewMsg, true);
+          }
+          
           // If in explorer, refresh the folder
-          if (currentFsPath && currentFsPath.includes("uploads")) {
-            openDirectory(currentFsPath);
+          if (currentDirectoryPath && currentDirectoryPath.toLowerCase().includes("uploads")) {
+            openDirectory(currentDirectoryPath);
           }
         } else {
           const errText = await resp.text();
@@ -3352,12 +3364,16 @@
       const card = document.createElement("div");
       card.className = `file-node-3d ${isDir ? 'folder-card-glow' : ''}`;
       
+      const ext = (item.name || "").split(".").pop().toLowerCase();
+      const isImg = ["png", "jpg", "jpeg", "webp", "gif"].includes(ext);
+      const avatarHtml = isImg
+        ? `<div class="win-folder-avatar" style="border-radius:8px; overflow:hidden; border:1px solid rgba(56,189,248,0.5);"><img src="${serverBaseUrl}/api/fs/preview?path=${encodeURIComponent(item.path)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='${getWinSvgIcon(item)}'"></div>`
+        : `<div class="win-folder-avatar">${getWinSvgIcon(item)}</div>`;
+
       const left = document.createElement("div");
       left.className = "file-left-node";
       left.innerHTML = `
-        <div class="win-folder-avatar">
-          ${getWinSvgIcon(item)}
-        </div>
+        ${avatarHtml}
         <div class="file-specs">
           <div class="file-headline">
             <span>${item.name}</span>
