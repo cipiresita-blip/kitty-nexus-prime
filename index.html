@@ -1207,6 +1207,8 @@
 
       <form class="chat-dock-3d" onsubmit="event.preventDefault(); sendChatMessage(); return false;">
         <button type="button" class="btn-voice-rec" id="btnVoiceMic" onclick="toggleVoiceDictation()" title="Comandă Vocală">🎙️</button>
+        <button type="button" class="btn-voice-rec" id="btnUploadFile" onclick="triggerMobileFileUpload()" title="Trimite Fișiere pe PC" style="background:linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.4)); border-color:#34d399; font-size:15px;">📎</button>
+        <input type="file" id="mobileUploadInput" style="display:none;" onchange="handleMobileFileUpload(this)">
         <input type="file" id="audioFallbackInput" accept="audio/*" capture="microphone" style="display:none;" onchange="handleAudioFallbackFile(this)">
         <input type="text" id="chatInput" class="input-matrix-field" placeholder="Scrie mesajul sau apasă pe microfon..." autocomplete="off" enterkeyhint="send" onkeydown="if(event.key==='Enter'||event.keyCode===13){event.preventDefault();sendChatMessage();}">
         <button type="button" class="btn-3d btn-3d-cyan btn-3d-send" onclick="sendChatMessage()" title="Trimite comanda">➤</button>
@@ -1237,6 +1239,7 @@
         <div class="fs-nav-actions">
           <div class="fs-path-badge" id="fsBreadcrumb">Desktop</div>
           <div style="display:flex; gap:5px;">
+            <button class="btn-3d btn-3d-emerald" style="padding:5px 8px; font-size:9.5px;" onclick="triggerMobileFileUpload()">📤 TRIMITE PE PC</button>
             <button class="btn-3d btn-3d-purple" style="padding:5px 8px; font-size:9.5px;" onclick="openDirectory('roots')">🏠 RĂDĂCINĂ</button>
             <button class="btn-3d btn-3d-cyan" style="padding:5px 8px; font-size:9.5px;" id="btnGoParent" onclick="navigateParent()">⬆️ SUS</button>
           </div>
@@ -1537,9 +1540,67 @@
 
   function openInboxMobil() {
     triggerHaptic(30);
-    triggerToast("📥 Deschidere Dosar Inbox Mobil...");
-    openDirectory("C:\\Users\\User\\Desktop\\antigravity kitty casa\\inbox_mobil");
+    triggerToast("📥 Deschidere Dosar Uploads Telefon...");
+    openDirectory("C:\\Users\\User\\Desktop\\uploads de pe telefon");
     switchDock("viewExplorer", document.getElementById("dockBtnExplorer"));
+  }
+
+  function triggerMobileFileUpload() {
+    triggerHaptic(35);
+    const fileInput = document.getElementById("mobileUploadInput");
+    if (fileInput) {
+      fileInput.value = "";
+      fileInput.click();
+    }
+  }
+
+  async function handleMobileFileUpload(inputElem) {
+    if (!inputElem.files || !inputElem.files[0]) return;
+    const file = inputElem.files[0];
+    const uploadBtn = document.getElementById("btnUploadFile");
+    
+    triggerHaptic(50);
+    triggerToast(`⏳ Se trimite '${file.name}' către PC...`);
+    if (uploadBtn) uploadBtn.style.opacity = "0.5";
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64Data = e.target.result;
+      const targetUrl = serverBaseUrl || FIXED_CLOUDFLARE_URL;
+      
+      try {
+        const resp = await fetch(`${targetUrl}/api/upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: file.name,
+            content: base64Data,
+            target_dir: "C:\\Users\\User\\Desktop\\uploads de pe telefon"
+          })
+        });
+
+        if (resp.ok) {
+          const resJson = await resp.json();
+          triggerHaptic(80);
+          triggerToast(`✅ '${file.name}' a fost salvat pe Desktop-ul PC!`);
+          
+          // If in explorer, refresh the folder
+          if (currentFsPath && currentFsPath.includes("uploads")) {
+            openDirectory(currentFsPath);
+          }
+        } else {
+          const errText = await resp.text();
+          triggerToast(`⚠️ Eroare trimitere fișier: ${resp.status}`);
+          console.error("Upload error:", errText);
+        }
+      } catch (err) {
+        console.error("Upload network error:", err);
+        triggerToast("⚠️ Conexiune PC indisponibilă");
+      } finally {
+        if (uploadBtn) uploadBtn.style.opacity = "1";
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   function forceOtaSync() {
