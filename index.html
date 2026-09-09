@@ -1394,6 +1394,81 @@
             <div class="cmd-pod-title">Update OTA</div>
             <div class="cmd-pod-desc">Actualizare automată fără reinstalare</div>
           </div>
+          <div class="cmd-pod-3d" onclick="refreshAiQuotaDashboard(true)" style="border-color:rgba(0, 242, 254, 0.45); box-shadow:0 0 12px rgba(0, 242, 254, 0.2);">
+            <span class="cmd-icon-halo">📊</span>
+            <div class="cmd-pod-title" style="color:var(--neon-cyan);">Cote & Credite AI</div>
+            <div class="cmd-pod-desc">Consum, credite și timp resetare</div>
+          </div>
+        </div>
+
+        <!-- 3D AI Quota & Credits Dashboard Pod -->
+        <div id="aiQuotaPod" style="margin-top:14px; background:linear-gradient(180deg, rgba(13, 20, 48, 0.88) 0%, rgba(8, 12, 30, 0.96) 100%); border:1.5px solid rgba(0, 242, 254, 0.4); border-radius:14px; padding:14px; box-shadow:0 6px 24px rgba(0, 242, 254, 0.18);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:15px;">📊</span>
+              <span style="font-size:11.5px; font-weight:900; color:var(--neon-cyan); letter-spacing:0.5px;">COTE & CREDITE AGENȚI AI</span>
+            </div>
+            <button class="btn-3d btn-3d-chip" onclick="refreshAiQuotaDashboard(true)" style="padding:4px 8px; font-size:9.5px; color:var(--neon-cyan);">🔄 ACTUALIZEAZĂ</button>
+          </div>
+
+          <!-- Reset countdown banner -->
+          <div style="background:rgba(0, 242, 254, 0.08); border:1px solid rgba(0, 242, 254, 0.25); border-radius:10px; padding:8px 10px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:9.5px; color:var(--text-dim); text-transform:uppercase; font-weight:700;">Reset Zilnic Cota Gratuită:</div>
+              <div style="font-size:11px; font-weight:800; color:#fff;" id="quotaResetRoTime">03:00 (Ora României) / 00:00 UTC</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:9px; color:var(--neon-cyan); font-weight:800;">TIMP RĂMAS</div>
+              <div style="font-size:13px; font-weight:900; color:var(--neon-emerald); font-family:var(--font-mono);" id="quotaResetCountdown">--h --m</div>
+            </div>
+          </div>
+
+          <!-- Agent Cards Grid -->
+          <div style="display:flex; flex-direction:column; gap:8px;" id="aiQuotaCardsContainer">
+            <!-- Gemini 3.6 Card -->
+            <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(56, 189, 248, 0.3); border-radius:10px; padding:9px 11px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="font-size:11px; font-weight:800; color:#7dd3fc;">💎 Google Gemini 3.6 (Flash/Pro)</span>
+                <span style="font-size:9.5px; font-weight:800; color:var(--neon-emerald); background:rgba(16, 185, 129, 0.15); padding:2px 6px; border-radius:6px;" id="geminiQuotaStatus">ACTIV</span>
+              </div>
+              <div style="font-size:10px; color:var(--text-dim); margin-bottom:5px;" id="geminiQuotaDetails">Cota zilnică: 1,500 cereri/zi • 15 RPM • 1M TPM</div>
+              <div style="display:flex; justify-content:space-between; font-size:9.5px; color:#fff; margin-bottom:3px;">
+                <span>Consumat azi: <b id="geminiUsedText" style="color:var(--neon-cyan);">0 / 1,500 cereri</b></span>
+                <span id="geminiRemainingText" style="color:var(--neon-emerald);">1,500 rămase</span>
+              </div>
+              <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                <div id="geminiQuotaBar" style="width:1%; height:100%; background:linear-gradient(90deg, #38bdf8, #00f2fe); border-radius:4px; transition:width 0.4s ease;"></div>
+              </div>
+            </div>
+
+            <!-- ChatGPT Card -->
+            <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(239, 68, 68, 0.3); border-radius:10px; padding:9px 11px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="font-size:11px; font-weight:800; color:#fca5a5;">⚡ ChatGPT-4o / Codex AI</span>
+                <span style="font-size:9.5px; font-weight:800; color:#ef4444; background:rgba(239, 68, 68, 0.18); padding:2px 6px; border-radius:6px;" id="openaiQuotaStatus">LIMITĂ 429</span>
+              </div>
+              <div style="font-size:10px; color:var(--text-dim); margin-bottom:3px;" id="openaiQuotaDetails">Credit balance: 0.00 $ consumat • Reîncărcare necesară</div>
+              <div style="font-size:9px; color:#94a3b8;">Notă: Toate cererile folosesc automat Gemini 3.6 fără întrerupere!</div>
+            </div>
+
+            <!-- Claude Card -->
+            <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(192, 132, 252, 0.3); border-radius:10px; padding:9px 11px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="font-size:11px; font-weight:800; color:#d8b4fe;">🔮 Claude 3.8 Sonnet / Opus</span>
+                <span style="font-size:9.5px; font-weight:800; color:var(--neon-purple); background:rgba(192, 132, 252, 0.15); padding:2px 6px; border-radius:6px;" id="claudeQuotaStatus">WEB BRIDGE</span>
+              </div>
+              <div style="font-size:10px; color:var(--text-dim);">Disponibil prin Web/Antigravity Agent Bridge • Fără limită API zilnică</div>
+            </div>
+
+            <!-- Antigravity Native PC Agent Card -->
+            <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(16, 185, 129, 0.35); border-radius:10px; padding:9px 11px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="font-size:11px; font-weight:800; color:#6ee7b7;">👑 Agent Nativ PC Google Antigravity</span>
+                <span style="font-size:9.5px; font-weight:800; color:var(--neon-emerald); background:rgba(16, 185, 129, 0.15); padding:2px 6px; border-radius:6px;">NELIMITAT (∞)</span>
+              </div>
+              <div style="font-size:10px; color:var(--text-dim);">Execuție nelimitată directă pe PC-ul tău • Control total sistem fără costuri</div>
+            </div>
+          </div>
         </div>
 
         <!-- 3D OTA Control Pod -->
@@ -2603,16 +2678,17 @@
 
   // Callback pentru recunoașterea vocală nativă Android din APK (Google Recognizer Dialog)
   window.onAndroidVoiceResult = function(spokenText) {
-    if (!spokenText) return;
+    if (!spokenText || !spokenText.trim()) return;
     const input = document.getElementById("chatInput");
     if (!input) return;
-    const current = input.value.trim();
-    input.value = current ? (current + " " + spokenText.trim()) : spokenText.trim();
+    const cleanSpoken = spokenText.trim();
+    input.value = cleanSpoken;
     triggerToast("🎙️ Mesaj vocal preluat! Trimit...");
     triggerHaptic(35);
-    setTimeout(() => {
+    if (voiceSendTimeoutId) clearTimeout(voiceSendTimeoutId);
+    voiceSendTimeoutId = setTimeout(() => {
       sendChatMessage();
-    }, 250);
+    }, 280);
   };
   window.onNativeSpeechResult = window.onAndroidVoiceResult;
 
@@ -2624,6 +2700,7 @@
   let audioChunks = [];
   let voiceSilenceTimer = null;
   let isTranscribingVoice = false;
+  let voiceSendTimeoutId = null;
 
   function initSpeechRecognition() {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2637,6 +2714,7 @@
 
     rec.onstart = function() {
       isDictating = true;
+      if (voiceSendTimeoutId) clearTimeout(voiceSendTimeoutId);
       const micBtn = document.getElementById("btnVoiceMic");
       if (micBtn) micBtn.classList.add("listening");
       triggerToast("🎙️ Te ascult, Master Nikolas! Vorbește în română...");
@@ -2684,9 +2762,10 @@
       if (input && input.value.trim().length > 0) {
         triggerToast("🎙️ Trimit direct către Kitty...");
         triggerHaptic(30);
-        setTimeout(() => {
+        if (voiceSendTimeoutId) clearTimeout(voiceSendTimeoutId);
+        voiceSendTimeoutId = setTimeout(() => {
           sendChatMessage();
-        }, 250);
+        }, 280);
       }
     };
 
@@ -2855,17 +2934,18 @@
               });
               const data = await res.json();
               if (data.status === "ok" && data.transcript) {
-                const current = input ? input.value.trim() : "";
+                const cleanTxt = data.transcript.trim();
                 if (input) {
-                  input.value = current ? (current + " " + data.transcript.trim()) : data.transcript.trim();
+                  input.value = cleanTxt;
                   input.focus();
                 }
                 triggerToast("🎙️ Trimit mesajul vocal...");
                 triggerHaptic(35);
                 scrollChatToBottom(false);
-                setTimeout(() => {
+                if (voiceSendTimeoutId) clearTimeout(voiceSendTimeoutId);
+                voiceSendTimeoutId = setTimeout(() => {
                   sendChatMessage();
-                }, 250);
+                }, 280);
               } else {
                 triggerToast("🎙️ Nu s-a distins niciun cuvânt clar");
               }
@@ -2932,17 +3012,18 @@
           });
           const data = await res.json();
           if (data.status === "ok" && data.transcript) {
-            const current = input ? input.value.trim() : "";
+            const cleanTxt = data.transcript.trim();
             if (input) {
-              input.value = current ? (current + " " + data.transcript.trim()) : data.transcript.trim();
+              input.value = cleanTxt;
               input.focus();
             }
             triggerToast("🎙️ Trimit mesajul vocal...");
             triggerHaptic(35);
             scrollChatToBottom(false);
-            setTimeout(() => {
+            if (voiceSendTimeoutId) clearTimeout(voiceSendTimeoutId);
+            voiceSendTimeoutId = setTimeout(() => {
               sendChatMessage();
-            }, 250);
+            }, 280);
           } else {
             triggerToast("🎙️ Nu s-a distins niciun cuvânt clar");
           }
@@ -3168,7 +3249,14 @@
     return row;
   }
 
+  let isSendingChatLock = false;
+
   async function sendChatMessage() {
+    if (isSendingChatLock) return;
+    if (voiceSendTimeoutId) {
+      clearTimeout(voiceSendTimeoutId);
+      voiceSendTimeoutId = null;
+    }
     if (isDictating) {
       opresteDictare();
     }
@@ -3176,6 +3264,9 @@
     if (!input) return;
     const txt = input.value.trim();
     if (!txt) return;
+
+    isSendingChatLock = true;
+    setTimeout(() => { isSendingChatLock = false; }, 800);
 
     triggerHaptic(25);
     input.value = "";
@@ -3235,13 +3326,22 @@
 
             // Avoid duplicating message Master just sent locally
             if (m.sender === "master") {
-              const cleanTxt = (m.text || "").trim();
-              const localMatch = box.querySelector(`.chat-node.master[data-text="${CSS.escape(cleanTxt)}"]`);
-              if (localMatch && !localMatch.dataset.synced) {
-                localMatch.dataset.synced = "true";
+              const cleanTxt = (m.text || "").trim().toLowerCase();
+              // Caută orice nod local master recent cu text similar
+              const allMasterNodes = box.querySelectorAll('.chat-node.master');
+              let matchedNode = null;
+              for (const node of allMasterNodes) {
+                const nodeTxt = (node.dataset.text || node.textContent || "").trim().toLowerCase();
+                if (!node.dataset.synced && (nodeTxt === cleanTxt || nodeTxt.includes(cleanTxt) || cleanTxt.includes(nodeTxt))) {
+                  matchedNode = node;
+                  break;
+                }
+              }
+              if (matchedNode) {
+                matchedNode.dataset.synced = "true";
                 if (m.id) {
                   processedMessageIds.add(m.id);
-                  localMatch.dataset.id = m.id;
+                  matchedNode.dataset.id = m.id;
                 }
                 continue;
               }
@@ -3690,6 +3790,34 @@
   }
 
   // ================= CONSOLE & COMMANDS =================
+  async function refreshAiQuotaDashboard(notify = false) {
+    if (notify) triggerHaptic(25);
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/ai/quota`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.reset) {
+          const resetEl = document.getElementById("quotaResetCountdown");
+          if (resetEl) resetEl.textContent = data.reset.countdown_text || "--h --m";
+          const roEl = document.getElementById("quotaResetRoTime");
+          if (roEl) roEl.textContent = `${data.reset.local_ro_time} / ${data.reset.utc_midnight}`;
+        }
+        if (data.agents && data.agents.gemini) {
+          const g = data.agents.gemini;
+          const usedEl = document.getElementById("geminiUsedText");
+          if (usedEl) usedEl.textContent = `${g.used_today} / ${g.daily_limit} cereri`;
+          const remEl = document.getElementById("geminiRemainingText");
+          if (remEl) remEl.textContent = `${Math.max(0, g.daily_limit - g.used_today)} rămase`;
+          const bar = document.getElementById("geminiQuotaBar");
+          if (bar) bar.style.width = `${Math.max(1, g.used_percent)}%`;
+        }
+        if (notify) triggerToast("✅ Cote AI actualizate în timp real!");
+      }
+    } catch(e) {
+      if (notify) triggerToast("Eroare interogare cote AI");
+    }
+  }
+
   async function refreshTelemetry() {
     try {
       const res = await fetch(`${serverBaseUrl}/api/status`, { cache: "no-store" });
@@ -3699,6 +3827,7 @@
         document.getElementById("valDisk").textContent = `${data.free_disk_gb} GB`;
         document.getElementById("valHost").textContent = data.hostname || "PC";
       }
+      refreshAiQuotaDashboard(false);
     } catch(e) {}
   }
 
