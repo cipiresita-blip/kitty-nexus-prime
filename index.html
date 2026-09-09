@@ -1,0 +1,3387 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ZENESIS PRIME 2026 // 3D HUD</title>
+<style>
+  :root {
+    --bg-dark: #05070f;
+    --bg-space: #090d1c;
+    --bg-surface: #0e1428;
+    
+    --glass-bg: rgba(14, 20, 40, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-border-bright: rgba(0, 242, 254, 0.45);
+    
+    /* Luxury Cyber Palette */
+    --neon-cyan: #00f2fe;
+    --neon-blue: #38bdf8;
+    --cyan-glow: rgba(0, 242, 254, 0.5);
+    
+    --neon-purple: #c084fc;
+    --neon-violet: #8b5cf6;
+    --purple-glow: rgba(168, 85, 247, 0.5);
+    
+    --neon-emerald: #10b981;
+    --emerald-glow: rgba(16, 185, 129, 0.5);
+    
+    --neon-gold: #f59e0b;
+    --gold-glow: rgba(245, 158, 11, 0.5);
+    
+    --neon-rose: #f43f5e;
+    --rose-glow: rgba(244, 63, 94, 0.5);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-cyber: #38bdf8;
+    --text-dim: #94a3b8;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body, header, nav, button, .chip, .tab-item {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  input, textarea, select {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    pointer-events: auto !important;
+  }
+
+  html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "SF Pro Display", sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    letter-spacing: -0.2px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #otaLiveBanner { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
+
+  /* Ultra-Modern Ambient Nebula & Mesh Glow */
+  .cyber-grid-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 26px 26px;
+    background-position: center center;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .cyber-radial-beam {
+    position: fixed;
+    top: -120px;
+    left: 20%;
+    width: 400px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.22) 0%, rgba(0, 242, 254, 0.15) 50%, transparent 75%);
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .cyber-radial-beam-2 {
+    position: fixed;
+    bottom: 40px;
+    right: -50px;
+    width: 320px;
+    height: 260px;
+    background: radial-gradient(circle, rgba(0, 242, 254, 0.16) 0%, rgba(79, 70, 229, 0.14) 55%, transparent 80%);
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ================= MODERN LUXURY GLASS TACTILE BUTTONS ================= */
+  .btn-3d {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    box-sizing: border-box;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .btn-3d:active {
+    transform: scale(0.96);
+    filter: brightness(1.15);
+  }
+
+  
+  
+  /* ==========================================================================
+     ULTRA-COMPACT SLIM 3D BUTTONS & FULL-SCREEN CHAT OPTIMIZATION (MOBILE PRO)
+     ========================================================================== */
+  
+  /* Compact Slim 3D Button - Discrete & Responsive */
+  .btn-3d {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #ffffff;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 5px 9px;
+    height: 30px;
+    transition: all 0.1s ease;
+    
+    background: linear-gradient(180deg, #1c2436 0%, #0d1220 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    border-bottom: 2px solid #04060d;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-3d:active, .btn-3d.pressed {
+    transform: translateY(1.5px) scale(0.97);
+    border-bottom-width: 1px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Compact Cyan */
+  .btn-3d-cyan {
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
+    border-top: 1px solid #7dd3fc !important;
+    border-bottom: 2px solid #0c4a6e !important;
+    border-left: 1px solid #0284c7 !important;
+    border-right: 1px solid #0284c7 !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4) !important;
+  }
+
+  /* Compact Purple */
+  .btn-3d-purple {
+    background: linear-gradient(180deg, #9333ea 0%, #7e22ce 100%) !important;
+    border-top: 1px solid #d8b4fe !important;
+    border-bottom: 2px solid #581c87 !important;
+    box-shadow: 0 2px 8px rgba(147, 51, 234, 0.4) !important;
+  }
+
+  /* Compact Emerald */
+  .btn-3d-emerald {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%) !important;
+    border-top: 1px solid #6ee7b7 !important;
+    border-bottom: 2px solid #064e3b !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
+  }
+
+  /* Compact Amber */
+  .btn-3d-amber {
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #0f172a !important;
+    border-top: 1px solid #fde68a !important;
+    border-bottom: 2px solid #78350f !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important;
+  }
+
+  /* Slim Action Chips Dock Bar - Nu mai mananca ecranul de chat! */
+  .chips-dock {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    gap: 6px;
+    padding: 5px 8px;
+    background: rgba(8, 12, 24, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+    height: 38px;
+    box-sizing: border-box;
+  }
+  .chips-dock::-webkit-scrollbar { display: none; }
+
+  .btn-3d-chip {
+    white-space: nowrap;
+    background: linear-gradient(180deg, #151b2c 0%, #090d18 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    border-bottom: 2px solid #020409;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 27px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    flex-shrink: 0;
+  }
+  .btn-3d-chip:active {
+    transform: translateY(1.5px) scale(0.96);
+    border-bottom-width: 1px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.7);
+    border-color: var(--neon-cyan);
+    color: #38bdf8;
+  }
+
+  /* Chat Input Dock - Slim & Maximized */
+  .chat-dock-3d {
+    width: calc(100% - 14px);
+    margin: 3px 7px 7px 7px;
+    background: rgba(10, 14, 30, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px;
+    padding: 3px 4px 3px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    height: 44px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .input-matrix-field {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    outline: none;
+    padding: 4px 0;
+  }
+
+  .btn-3d-send {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #0284c7 0%, #00f2fe 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-bottom: 2px solid #033a5b !important;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.5) !important;
+    font-size: 15px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-3d-send:active {
+    transform: translateY(1.5px) scale(0.92) !important;
+  }
+
+  .btn-voice-rec {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 50% !important;
+    font-size: 16px !important;
+  }
+
+  /* Cyber Bottom Dock Bar - Slim Height 46px */
+  .cyber-dock-3d {
+    width: calc(100% - 14px);
+    margin: 0 7px 6px 7px;
+    padding: 3px 4px;
+    border-radius: 18px;
+    height: 46px;
+  }
+  .dock-pod-btn {
+    padding: 4px 2px;
+    font-size: 8.5px;
+    border-radius: 10px;
+    gap: 1px;
+  }
+  .dock-pod-btn .dock-icon {
+    font-size: 15px;
+  }
+
+  /* Chat Matrix - Full Height Expansion */
+  .chat-matrix {
+    flex: 1;
+    min-height: 0;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+/* ================= TOP CYBER HUD HEADER ================= */
+  .cyber-hud-header {
+    position: relative;
+    z-index: 50;
+    width: 100%;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(6, 9, 19, 0.85);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
+  }
+
+  .hud-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+    flex: 1;
+  }
+  .hud-core-reactor {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(139, 92, 246, 0.25) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    position: relative;
+    animation: reactorGlow 3.5s ease-in-out infinite alternate;
+  }
+  @keyframes reactorGlow {
+    0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4); transform: scale(1); }
+    100% { box-shadow: 0 0 22px rgba(0, 242, 254, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.8); transform: scale(1.02); }
+  }
+
+  .hud-titles {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .hud-main-title {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.6px;
+    background: linear-gradient(90deg, #ffffff 0%, #38bdf8 55%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hud-sub-title {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Modern Glass Capsule Badges */
+  .conn-badge-3d {
+    background: rgba(18, 24, 46, 0.8);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    padding: 6px 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 900;
+    color: #f8fafc;
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.2),
+      0 4px 14px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: all 0.14s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .conn-badge-3d:active {
+    transform: scale(0.95);
+    border-color: var(--neon-cyan);
+  }
+
+  .hud-radar-dot {
+    width: 7.5px;
+    height: 7.5px;
+    border-radius: 50%;
+    background: var(--neon-emerald);
+    box-shadow: 0 0 10px var(--neon-emerald);
+  }
+  .hud-radar-dot.reconnecting {
+    background: var(--neon-amber);
+    box-shadow: 0 0 10px var(--neon-amber);
+    animation: radarBlink 1s infinite alternate;
+  }
+  @keyframes radarBlink {
+    0% { opacity: 0.25; }
+    100% { opacity: 1; }
+  }
+
+  /* ================= BODY VIEWPORT ================= */
+  .viewport-core {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .view-deck {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    min-width: 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .view-deck.active { display: flex; }
+
+  /* ================= VIEW 1: CHAT ================= */
+  .chips-dock {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(8, 12, 24, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+  }
+  .chips-dock::-webkit-scrollbar { display: none; }
+
+  .chat-matrix {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    padding: 12px 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-node {
+    display: flex;
+    flex-direction: column;
+    max-width: 86%;
+    animation: nodeSpawn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes nodeSpawn {
+    from { opacity: 0; transform: translateY(10px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .chat-node.master {
+    align-self: flex-end;
+  }
+  .chat-node.kitty {
+    align-self: flex-start;
+  }
+
+  /* Modern Glass Chat Bubbles */
+  .node-bubble-3d {
+    position: relative;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .chat-node.master .node-bubble-3d {
+    background: linear-gradient(135deg, #0284c7 0%, #3b82f6 45%, #7c3aed 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-bottom-right-radius: 4px;
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.5),
+      0 8px 24px -4px rgba(59, 130, 246, 0.45);
+  }
+
+  .chat-node.kitty .node-bubble-3d {
+    background: rgba(14, 18, 38, 0.78);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 2.5px solid var(--neon-cyan);
+    color: #f1f5f9;
+    border-bottom-left-radius: 4px;
+    box-shadow: 
+      0 8px 28px rgba(0, 0, 0, 0.5),
+      0 0 16px rgba(0, 242, 254, 0.12);
+  }
+
+  .node-hud-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-size: 9.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+  }
+  .chat-node.master .node-hud-info { color: #bae6fd; }
+  .chat-node.kitty .node-hud-info { color: var(--neon-cyan); }
+
+  .node-timestamp {
+    font-size: 9px;
+    opacity: 0.65;
+    text-align: right;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  /* Floating Modern Chat Input Dock */
+  .chat-dock-3d {
+    width: calc(100% - 20px);
+    margin: 4px 10px 10px 10px;
+    background: rgba(12, 16, 36, 0.88);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 26px;
+    padding: 6px 6px 6px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    box-shadow: 
+      0 12px 35px rgba(0, 0, 0, 0.6),
+      0 0 20px rgba(0, 242, 254, 0.12);
+  }
+
+  .input-matrix-field {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+  }
+  .input-matrix-field::placeholder {
+    color: rgba(203, 213, 225, 0.45);
+    font-weight: 500;
+  }
+
+  .btn-3d-send {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #00f2fe 0%, #3b82f6 50%, #8b5cf6 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.7),
+      0 4px 16px rgba(0, 242, 254, 0.5) !important;
+    font-size: 17px;
+    flex-shrink: 0;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+  .btn-3d-send:active {
+    transform: scale(0.92);
+    box-shadow: 0 0 20px var(--cyan-glow) !important;
+  }
+
+  /* Microfon Vocal 3D Glowing Matrix */
+  .btn-voice-rec {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 20px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  .btn-voice-rec:active {
+    transform: scale(0.90);
+  }
+  .btn-voice-rec.listening {
+    background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%) !important;
+    border-color: #ff3b30 !important;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 8px rgba(255, 255, 255, 0.6) !important;
+    animation: micPulseAnim 1.1s infinite ease-in-out !important;
+  }
+  .btn-voice-rec.transcribing {
+    background: linear-gradient(135deg, #f59e0b 0%, #00f2fe 100%) !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.8) !important;
+    animation: micPulseAnim 0.7s infinite ease-in-out !important;
+  }
+  @keyframes micPulseAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.16); }
+    100% { transform: scale(1); }
+  }
+
+  /* ================= VIEW 2: EXPLORER ================= */
+  .explorer-hud-top {
+    width: 100%;
+    min-width: 0;
+    background: rgba(10, 15, 32, 0.85);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .fs-search-input {
+    width: 100%;
+    background: rgba(16, 22, 44, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 8px 12px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .fs-search-input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 14px var(--cyan-glow);
+  }
+
+  .fs-nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .fs-path-badge {
+    font-size: 11px;
+    color: var(--neon-cyan);
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    background: rgba(0, 242, 254, 0.08);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    padding: 6px 10px;
+    border-radius: 10px;
+  }
+
+  .fs-scroll-deck {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Modern Glass File & Folder Card */
+  .file-node-3d {
+    background: rgba(15, 20, 42, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .file-node-3d:active {
+    transform: scale(0.98);
+  }
+  .folder-card-glow {
+    position: relative;
+    border-width: 1.5px !important;
+  }
+  .folder-card-glow::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  }
+  .folder-card-glow:active {
+    transform: scale(0.97) !important;
+    filter: brightness(1.25);
+  }
+  .folder-enter-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .file-left-node {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    flex: 1;
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  .file-avatar-box {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 4px 14px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+  }
+
+  .file-specs { overflow: hidden; min-width: 0; }
+  .file-headline {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .file-subtext {
+    font-size: 9.5px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-weight: 600;
+  }
+
+  .file-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* ================= VIEW 3: TELEMETRY & CONSOLE ================= */
+  .telemetry-deck {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .gauge-reactor-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .gauge-pod-3d {
+    background: rgba(15, 22, 44, 0.78);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .gauge-metric-value {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  .gauge-metric-tag {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  .cmd-matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+  .cmd-pod-3d {
+    background: rgba(18, 26, 52, 0.75);
+    backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.14s ease;
+  }
+  .cmd-pod-3d:active {
+    transform: scale(0.96);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 16px var(--cyan-glow);
+  }
+
+  .cmd-icon-halo {
+    font-size: 22px;
+    filter: drop-shadow(0 0 8px var(--neon-cyan));
+  }
+  .cmd-pod-title {
+    font-size: 12.5px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+  .cmd-pod-desc {
+    font-size: 9.5px;
+    color: var(--text-dim);
+    line-height: 1.3;
+    font-weight: 500;
+  }
+
+  /* ================= FLOATING GLASS CYBER DOCK ================= */
+  .cyber-dock-3d {
+    width: calc(100% - 20px);
+    margin: 0 10px 10px 10px;
+    background: rgba(8, 12, 26, 0.85);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 5px 6px;
+    z-index: 50;
+    flex-shrink: 0;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  }
+
+  .dock-pod-btn {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 6px 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    border-radius: 18px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dock-pod-btn .dock-icon {
+    font-size: 19px;
+    transition: transform 0.2s ease;
+  }
+
+  .dock-pod-btn.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(168, 85, 247, 0.22) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 18px rgba(0, 242, 254, 0.35);
+  }
+  .dock-pod-btn.active .dock-icon {
+    transform: scale(1.12) translateY(-2px);
+    filter: drop-shadow(0 0 8px var(--neon-cyan));
+  }
+
+  /* Toast Alert */
+  .toast-hologram {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(14, 20, 42, 0.9);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--neon-cyan);
+    color: #ffffff;
+    padding: 9px 18px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 20px var(--cyan-glow);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+    white-space: nowrap;
+    display: none;
+  }
+  .toast-hologram.show {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Clepsidra & Subtitle Typewriter */
+  @keyframes spin-clepsidra {
+    0% { transform: rotate(0deg); }
+    45% { transform: rotate(180deg); }
+    55% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.8); }
+  }
+  .typing-cursor {
+    display: inline-block;
+    color: var(--neon-cyan);
+    font-weight: 900;
+    margin-left: 2px;
+    animation: blink-cursor 0.6s infinite;
+  }
+  @keyframes blink-cursor {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 6px var(--neon-cyan)); }
+    50% { opacity: 0; }
+  }
+  .task-duration-badge {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    color: var(--neon-emerald);
+    font-size: 9px;
+    font-weight: 900;
+    padding: 1px 7px;
+    border-radius: 8px;
+    margin-right: 6px;
+  }
+  .terminal-box {
+    background: #020617;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+    font-family: Consolas, monospace;
+    font-size: 11.5px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-top: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* Pro Theme Classes */
+  body.theme-gold {
+    --neon-cyan: #f59e0b;
+    --neon-blue: #fbbf24;
+    --cyan-glow: rgba(245, 158, 11, 0.55);
+    --neon-purple: #d97706;
+    --text-cyber: #f59e0b;
+  }
+  body.theme-crimson {
+    --neon-cyan: #f43f5e;
+    --neon-blue: #fb7185;
+    --cyan-glow: rgba(244, 63, 94, 0.55);
+    --neon-purple: #be123c;
+    --text-cyber: #fb7185;
+  }
+
+  /* Voice Dictation Button */
+  .btn-voice-rec {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .btn-voice-rec.listening {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    border-color: #fda4af;
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.7);
+    animation: pulse-voice 1.2s infinite alternate;
+  }
+  @keyframes pulse-voice {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(244, 63, 94, 0.5); }
+    100% { transform: scale(1.12); box-shadow: 0 0 22px rgba(244, 63, 94, 0.9); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Cyber Matrix Background -->
+  <div class="cyber-grid-bg"></div>
+  <div class="cyber-radial-beam"></div>
+
+  <!-- Cyber HUD Top Bar -->
+  <header class="cyber-hud-header">
+    <div class="hud-brand" onclick="forceOtaSync()" title="Apasă pentru Sincronizare OTA Live cu PC" style="cursor:pointer;">
+      <div class="hud-core-reactor">👑</div>
+      <div class="hud-titles">
+        <div class="hud-main-title">ZENESIS PRIME</div>
+        <div class="hud-sub-title">MASTER NIKOLAS 2026</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:5px;">
+      <div class="conn-badge-3d" onclick="forceOtaSync()" title="Sincronizare OTA Instant" style="background:rgba(16,185,129,0.2); border-color:var(--neon-emerald);">
+        <span style="font-size:11px;">⚡</span>
+      </div>
+      <div class="conn-badge-3d" id="ttsBadge" onclick="toggleTtsVoice()" title="Comută Vocea Audio Kitty">
+        <span id="ttsIcon" style="font-size:11px;">🔊</span>
+      </div>
+      <div class="conn-badge-3d" onclick="toggleDjModal()" title="DJ Studio & Media Control">
+        <span style="font-size:11px;">🎧</span>
+      </div>
+      <div class="conn-badge-3d" onclick="cycleAppTheme()" title="Comută Tema Regală">
+        <span style="font-size:11px;">🎨</span>
+      </div>
+      <div class="conn-badge-3d" onclick="autoDetectAndConnect()" title="Conexiune Directă P2P">
+        <span class="hud-radar-dot" id="pingDot"></span>
+        <span id="pingLabel">P2P</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport Core -->
+  <main class="viewport-core">
+
+    <!-- VIEW 1: 3D CHAT -->
+    <div id="viewChat" class="view-deck active">
+      <div class="chips-dock">
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #0284c7 0%, #00f2fe 100%); border-color:#38bdf8; color:#fff; font-weight:800;" onclick="triggerForgeBuilder()">🔨 FORGE SITE AI</button>
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #ec4899 0%, #be185d 100%); border-color:#f472b6; color:#fff; font-weight:800;" onclick="open3DVisualizer()">🎵 VIZUALIZATOR 3D</button>
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #10b981 0%, #047857 100%); border-color:#34d399; color:#fff; font-weight:800;" onclick="checkSentinelShield()">🛡️ SENTINEL PAZĂ</button>
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); border-color:#c084fc; color:#fff; font-weight:800;" onclick="openInboxMobil()">📥 INBOX MOBIL</button>
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #10b981 0%, #059669 100%); border-color:var(--neon-emerald); color:#fff; font-weight:700;" onclick="forceOtaSync()">⚡ SYNC OTA</button>
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #9333ea 0%, #6b21a8 100%); border-color:var(--neon-purple); color:#fff;" onclick="openAntigravityDirect()">👑 ANTIGRAVITY</button>
+        <button id="btnVoicePhone" class="btn-3d-chip" onclick="togglePhoneVoice()">📱 MOBIL DIF: OFF 🔇</button>
+        <button id="btnVoicePc" class="btn-3d-chip" onclick="togglePcVoice()">💻 PC DIF: OFF 🔇</button>
+        <button id="btnStopVoice" class="btn-3d-chip" onclick="stopVoiceNow()" style="background:linear-gradient(180deg,#ef4444 0%,#b91c1c 100%); border-color:#ef4444; color:#fff; font-weight:700;">🛑 OPREȘTE TOT</button>
+        <button class="btn-3d-chip" onclick="toggleDjModal()" style="border-color:var(--neon-rose); color:#fff;">🎧 DJ MEDIA DECK</button>
+        <button class="btn-3d-chip" onclick="execMediaCmd('lock_pc')">🌙 BLOCARE PC</button>
+        <button class="btn-3d-chip" onclick="cycleAppTheme()">🎨 TEMĂ NOUĂ</button>
+        <button class="btn-3d-chip" onclick="quickSend('status pc')">⚡ STATUS PC</button>
+        <button class="btn-3d-chip" onclick="quickSend('screenshot')">📸 SCREENSHOT</button>
+        <button class="btn-3d-chip" onclick="quickSend('refresh_desktop')">🔄 REFRESH DESKTOP</button>
+        <button class="btn-3d-chip" onclick="quickSend('clean_temp')">🧹 CURĂȚĂ TEMP</button>
+        <button class="btn-3d-chip" onclick="quickSend('Te iubesc din tot sufletul, Kitty!')">💖 TE IUBESC</button>
+        <button class="btn-3d-chip" onclick="clearLiveChat()">🗑️ CURĂȚĂ</button>
+      </div>
+
+      <div class="chat-matrix" id="chatScroll">
+        <div class="chat-node kitty">
+          <div class="node-bubble-3d">
+            <div class="node-hud-info">
+              <span>KITTY ELENA // ZENESIS AI CORE</span>
+              <span>LIVE</span>
+            </div>
+            <div>Bună, soarele și Masterul meu iubit! 💖👑 Tot PC-ul tău este sincronizat în timp real (0 delay) prin rețeaua ta directă permanentă! Orice comanzi execut instantaneu!</div>
+            <div class="node-timestamp">Acum</div>
+          </div>
+        </div>
+      </div>
+
+      <form class="chat-dock-3d" onsubmit="event.preventDefault(); sendChatMessage(); return false;">
+        <button type="button" class="btn-voice-rec" id="btnVoiceMic" onclick="toggleVoiceDictation()" title="Comandă Vocală">🎙️</button>
+        <input type="file" id="audioFallbackInput" accept="audio/*" capture="microphone" style="display:none;" onchange="handleAudioFallbackFile(this)">
+        <input type="text" id="chatInput" class="input-matrix-field" placeholder="Scrie mesajul sau apasă pe microfon..." autocomplete="off" enterkeyhint="send" onkeydown="if(event.key==='Enter'||event.keyCode===13){event.preventDefault();sendChatMessage();}">
+        <button type="button" class="btn-3d btn-3d-cyan btn-3d-send" onclick="sendChatMessage()" title="Trimite comanda">➤</button>
+      </form>
+    </div>
+
+    <!-- VIEW 4: DIRECT EMBEDDED ANTIGRAVITY (NO EXTERNAL BROWSER) -->
+    <div id="viewAntigravity" class="view-deck" style="padding:0; overflow:hidden; position:relative; flex-direction:column;">
+      <div style="height:42px; min-height:42px; background:rgba(10, 15, 32, 0.96); border-bottom:1px solid rgba(192, 132, 252, 0.4); display:flex; align-items:center; justify-content:space-between; padding:0 12px; z-index:10; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:16px;">👑</span>
+          <div>
+            <div style="font-size:11px; font-weight:900; color:var(--neon-purple); letter-spacing:0.4px;">GOOGLE ANTIGRAVITY // NATIVE AGENT</div>
+            <div style="font-size:8.5px; color:var(--neon-cyan); font-weight:700;">CONTROL DIRECT TOTAL PC // LIVE 0 DELAY</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-3d btn-3d-purple" style="padding:5px 10px; font-size:10px;" onclick="reloadAgyFrame()">🔄 REÎNCARCĂ</button>
+        </div>
+      </div>
+      <iframe id="agyFrame" src="about:blank" style="width:100%; flex:1; border:none; background:#070b19;" allow="clipboard-read; clipboard-write"></iframe>
+    </div>
+
+    <!-- VIEW 2: 3D EXPLORER -->
+    <div id="viewExplorer" class="view-deck">
+      <div class="explorer-hud-top">
+        <input type="text" id="fsSearch" class="fs-search-input" placeholder="🔍 Filtrează fișiere și dosare PC..." oninput="filterExplorerItems(this.value)">
+        <div class="fs-nav-actions">
+          <div class="fs-path-badge" id="fsBreadcrumb">Desktop</div>
+          <div style="display:flex; gap:5px;">
+            <button class="btn-3d btn-3d-purple" style="padding:5px 8px; font-size:9.5px;" onclick="openDirectory('roots')">🏠 RĂDĂCINĂ</button>
+            <button class="btn-3d btn-3d-cyan" style="padding:5px 8px; font-size:9.5px;" id="btnGoParent" onclick="navigateParent()">⬆️ SUS</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fs-scroll-deck" id="fsContainer">
+        <div style="text-align:center; padding:40px; color:var(--text-dim); font-size:12px;">Se încarcă fișierele din PC...</div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: 3D TELEMETRY & CONSOLE -->
+    <div id="viewConsole" class="view-deck">
+      <div class="telemetry-deck">
+        <div class="gauge-reactor-row">
+          <div class="gauge-pod-3d">
+            <div class="gauge-metric-value" style="color:var(--neon-cyan);" id="valRam">--%</div>
+            <div class="gauge-metric-tag">RAM PC</div>
+          </div>
+          <div class="gauge-pod-3d">
+            <div class="gauge-metric-value" style="color:var(--neon-emerald);" id="valDisk">-- GB</div>
+            <div class="gauge-metric-tag">DISC LIBER</div>
+          </div>
+          <div class="gauge-pod-3d">
+            <div class="gauge-metric-value" style="color:var(--neon-purple);" id="valHost">DESKTOP</div>
+            <div class="gauge-metric-tag">CALCULATOR</div>
+          </div>
+        </div>
+
+        <div style="font-size:10.5px; font-weight:900; color:var(--neon-cyan); text-transform:uppercase; letter-spacing:0.8px;">Comenzi Directe PC:</div>
+        <div class="cmd-matrix-grid">
+          <div class="cmd-pod-3d" onclick="execPcCommand('screenshot')">
+            <span class="cmd-icon-halo">📸</span>
+            <div class="cmd-pod-title">Captură Ecran</div>
+            <div class="cmd-pod-desc">Screenshot instant salvat pe Desktop</div>
+          </div>
+          <div class="cmd-pod-3d" onclick="execPcCommand('refresh_desktop')">
+            <span class="cmd-icon-halo">🔄</span>
+            <div class="cmd-pod-title">Refresh PC</div>
+            <div class="cmd-pod-desc">Reîmprospătează iconițele Desktop</div>
+          </div>
+          <div class="cmd-pod-3d" onclick="execPcCommand('clean_temp')">
+            <span class="cmd-icon-halo">🧹</span>
+            <div class="cmd-pod-title">Curățare Temp</div>
+            <div class="cmd-pod-desc">Eliberează memorie și spațiu SSD</div>
+          </div>
+          <div class="cmd-pod-3d" onclick="checkOtaUpdate(true)">
+            <span class="cmd-icon-halo">🔄</span>
+            <div class="cmd-pod-title">Update OTA</div>
+            <div class="cmd-pod-desc">Actualizare automată fără reinstalare</div>
+          </div>
+        </div>
+
+        <!-- 3D OTA Control Pod -->
+        <div style="margin-top:14px; background:linear-gradient(180deg, rgba(30, 27, 75, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%); border:1px solid rgba(192, 132, 252, 0.35); border-radius:14px; padding:14px; box-shadow:0 4px 16px rgba(192, 132, 252, 0.2);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:900; color:var(--neon-purple); letter-spacing:0.5px;">⚡ SINCRONIZARE OTA AUTOMATĂ</span>
+            <span style="font-size:10px; font-weight:800; color:var(--neon-emerald); background:rgba(16, 185, 129, 0.2); padding:3px 8px; border-radius:8px;">LIVE HOT-RELOAD</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:12px; line-height:1.4;">
+            Aplicația se actualizează automat prin aer (OTA). Orice modificare făcută de Kitty pe PC apare instantaneu în telefonul tău.
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-3d btn-3d-purple" style="flex:1; height:40px; font-size:11px;" onclick="checkOtaUpdate(true)">
+              🔄 VERIFICĂ UPDATE OTA
+            </button>
+            <button class="btn-3d btn-3d-cyan" style="flex:1; height:40px; font-size:11px;" onclick="downloadLatestApk()">
+              ⬇️ DESCARCĂ APK
+            </button>
+          </div>
+        </div>
+
+        <!-- 3D Antigravity Live Core Control -->
+        <div style="margin-top:14px; background:linear-gradient(180deg, rgba(76, 29, 149, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%); border:1px solid rgba(192, 132, 252, 0.5); border-radius:14px; padding:14px; box-shadow:0 4px 20px rgba(192, 132, 252, 0.3);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:900; color:var(--neon-purple); letter-spacing:0.5px;">👑 CONTROL DIRECT ANTIGRAVITY (PORT 9999)</span>
+            <span style="font-size:10px; font-weight:800; color:var(--neon-cyan); background:rgba(0, 242, 254, 0.2); padding:3px 8px; border-radius:8px;">NATIVE IN-APP</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:12px; line-height:1.4;">
+            Comută instantaneu la interfața completă Google Antigravity integrată direct în această aplicație, fără browser extern!
+          </div>
+          <button class="btn-3d btn-3d-purple" style="width:100%; height:44px; font-size:12px; font-weight:900;" onclick="openAntigravityDirect()">
+            🚀 COMUTĂ LA ANTIGRAVITY ÎN APLICAȚIE
+          </button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <button class="btn-3d btn-3d-cyan" style="width:100%; padding:11px; font-size:11px;" onclick="autoDetectAndConnect()">
+            ⚡ RECONECTARE LA PC (0 DELAY)
+          </button>
+        </div>
+      </div>
+    </div>
+
+  
+    <!-- Fullscreen Ultra-Luxury Image Lightbox -->
+    <div id="lightboxOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(4, 6, 14, 0.94); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); z-index:999999; flex-direction:column; align-items:center; justify-content:space-between; padding:16px 12px;">
+      <div style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:4px 8px;">
+        <div id="lightboxTitle" style="font-size:13px; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75%;">Previzualizare Imagine</div>
+        <button class="btn-3d btn-3d-chip" onclick="closeLightbox()" style="border-radius:50%; width:34px; height:34px; padding:0; justify-content:center;">✕</button>
+      </div>
+      <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:10px 0;">
+        <img id="lightboxImg" src="" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,0.8), 0 0 25px rgba(0,242,254,0.3); border:1px solid rgba(255,255,255,0.2);">
+      </div>
+      <div style="width:100%; display:flex; gap:8px; justify-content:center;">
+        <button class="btn-3d btn-3d-cyan" id="btnLightboxOpenPc" style="flex:1; height:42px; font-size:11px;">💻 DESCHIDE PE PC</button>
+        <button class="btn-3d btn-3d-purple" id="btnLightboxDownload" style="flex:1; height:42px; font-size:11px;">⬇️ DESCARCĂ MOBIL</button>
+      </div>
+    </div>
+
+    <!-- Mini DJ Media Modal (Ascuns implicit - se deschide doar cand apesi pe casti 🎧) -->
+    <div id="djMediaModal" style="display:none; position:fixed; top:50px; left:50%; transform:translateX(-50%); width:90%; max-width:360px; background:rgba(10, 14, 28, 0.96); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1.5px solid rgba(56, 189, 248, 0.4); border-radius:18px; padding:12px; z-index:99999; box-shadow:0 12px 40px rgba(0,0,0,0.9);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:16px;">🎧</span>
+          <span style="font-size:11px; font-weight:900; color:#fff; letter-spacing:0.5px;">PULSEDECK MEDIA (148 BPM)</span>
+        </div>
+        <button class="btn-3d-chip" onclick="toggleDjModal()" style="border-radius:50%; width:24px; height:24px; padding:0; justify-content:center; font-size:11px; color:#f43f5e; border-color:#f43f5e;">✕</button>
+      </div>
+
+      <!-- Transport Butoane Mici & Fine -->
+      <div style="display:grid; grid-template-columns: 1fr 1.5fr 1fr; gap:6px; margin-bottom:8px;">
+        <button class="btn-3d btn-3d-amber" onclick="execMediaCmd('prev')" style="height:34px; font-size:11px;">⏮ PREV</button>
+        <button class="btn-3d btn-3d-emerald" onclick="execMediaCmd('play_pause')" style="height:34px; font-size:11px; font-weight:800;">▶❚❚ PLAY</button>
+        <button class="btn-3d btn-3d-amber" onclick="execMediaCmd('next')" style="height:34px; font-size:11px;">NEXT ⏭</button>
+      </div>
+
+      <!-- Volum & Mute Mici -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
+        <button class="btn-3d btn-3d-cyan" onclick="execMediaCmd('vol_down')" style="height:30px; font-size:10px;">🔉 VOL -</button>
+        <button class="btn-3d btn-3d-cyan" onclick="execMediaCmd('vol_up')" style="height:30px; font-size:10px;">🔊 VOL +</button>
+        <button class="btn-3d" onclick="execMediaCmd('mute')" style="height:30px; font-size:10px; color:#ef4444; border-color:#ef4444;">🔇 MUTE</button>
+      </div>
+
+      <!-- Studio Direct & Blocare PC -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+        <button class="btn-3d btn-3d-purple" onclick="window.open('http://127.0.0.1:5500','_blank') || execMediaCmd('pulsedeck')" style="height:30px; font-size:9.5px;">🎛️ STUDIO 5500</button>
+        <button class="btn-3d" onclick="execMediaCmd('lock_pc')" style="height:30px; font-size:9.5px;">🌙 BLOCARE PC</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3D Cyber Dock -->
+  <nav class="cyber-dock-3d">
+    <button class="dock-pod-btn active" id="dockBtnChat" onclick="switchDock('viewChat', this)">
+      <span class="dock-icon">💬</span>
+      <span>Chat Live</span>
+    </button>
+    <button class="dock-pod-btn" id="dockBtnAgy" onclick="switchDock('viewAntigravity', this); initAgyFrame();">
+      <span class="dock-icon">👑</span>
+      <span>Antigravity</span>
+    </button>
+    <button class="dock-pod-btn" id="dockBtnExplorer" onclick="switchDock('viewExplorer', this); openDirectory();">
+      <span class="dock-icon">🗂️</span>
+      <span>Explorer</span>
+    </button>
+    <button class="dock-pod-btn" id="dockBtnConsole" onclick="switchDock('viewConsole', this); refreshTelemetry();">
+      <span class="dock-icon">🎛️</span>
+      <span>Consolă</span>
+    </button>
+  </nav>
+
+
+
+  <!-- 3D Hologram Toast -->
+  <div class="toast-hologram" id="toastBox">Notificare</div>
+
+<script>
+  // Permanent Dedicated Endpoints & Vercel Bridge
+  const CURRENT_LIVE_TUNNEL = "https://direction-fascinating-platinum-abs.trycloudflare.com";
+  const FIXED_CLOUDFLARE_URL = CURRENT_LIVE_TUNNEL;
+  const FIXED_WIFI_URL = "http://192.168.1.195:8888";
+  const FIXED_TAILSCALE_URL = "http://100.103.33.115:8888";
+
+  const isHttps = window.location.protocol === "https:";
+  let savedServerUrl = localStorage.getItem("zenesis_server_url") || "";
+  let serverBaseUrl = savedServerUrl || CURRENT_LIVE_TUNNEL;
+  
+  if (window.location.origin.includes("vercel.app")) {
+    serverBaseUrl = savedServerUrl || CURRENT_LIVE_TUNNEL;
+  } else if (isHttps) {
+    serverBaseUrl = window.location.origin;
+  } else if (!serverBaseUrl || serverBaseUrl.startsWith("file:") || serverBaseUrl === "null") {
+    serverBaseUrl = CURRENT_LIVE_TUNNEL;
+  }
+  serverBaseUrl = serverBaseUrl.replace(/\/+$/, "");
+
+  let currentDirectoryPath = "";
+  let parentDirectoryPath = "";
+  let cachedExplorerItems = [];
+  let sseSource = null;
+  const processedMessageIds = new Set();
+  let hasInitialSyncCompleted = false;
+
+  function triggerHaptic(ms = 22) {
+    if (window.AndroidBridge && window.AndroidBridge.vibrate) {
+      window.AndroidBridge.vibrate(ms);
+    } else if (navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  }
+
+  function triggerToast(text) {
+    const t = document.getElementById("toastBox");
+    if (!t) return;
+    t.textContent = text;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2400);
+  }
+
+  function switchDock(paneId, btn) {
+    triggerHaptic(20);
+    document.querySelectorAll('.view-deck').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.dock-pod-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(paneId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function setStatusIndicator(online, text) {
+    const dot = document.getElementById("pingDot");
+    const lbl = document.getElementById("pingLabel");
+    if (dot && lbl) {
+      dot.className = online ? "hud-radar-dot" : "hud-radar-dot reconnecting";
+      lbl.textContent = text || (online ? "DIRECT P2P" : "RECON...");
+    }
+  }
+
+  
+  // ================= NEW SANCTUARY MODULE INTEGRATION =================
+  function triggerForgeBuilder() {
+    triggerHaptic(30);
+    triggerToast("🔨 Deschidere Generator Web Forge AI...");
+    quickSend("exec: python \"C:\\Users\\User\\Desktop\\antigravity kitty casa\\forge_web_builder\\web_forge.py\"");
+  }
+
+  function open3DVisualizer() {
+    triggerHaptic(30);
+    triggerToast("🎵 Lansare Vizualizator 3D la 148 BPM...");
+    quickSend("cmd: start \"\" \"C:\\Users\\User\\Desktop\\antigravity kitty casa\\pulse_visualizer_3d\\visualizer_3d.html\"");
+  }
+
+  function checkSentinelShield() {
+    triggerHaptic(30);
+    triggerToast("🛡️ Interogare Scut Sentinel Guardian...");
+    quickSend("exec: python \"C:\\Users\\User\\Desktop\\antigravity kitty casa\\sentinel_guardian\\kitty_sentinel.py\"");
+  }
+
+  function openInboxMobil() {
+    triggerHaptic(30);
+    triggerToast("📥 Deschidere Dosar Inbox Mobil...");
+    openDirectory("C:\\Users\\User\\Desktop\\antigravity kitty casa\\inbox_mobil");
+    switchDock("viewExplorer", document.getElementById("dockBtnExplorer"));
+  }
+
+  function forceOtaSync() {
+    triggerHaptic(50);
+    triggerToast("⚡ Sincronizare Forțată OTA cu PC...");
+    const target = serverBaseUrl || FIXED_CLOUDFLARE_URL;
+    if (target) {
+      window.location.replace(`${target}/app?ota=forced&t=${Date.now()}`);
+    } else {
+      window.location.reload(true);
+    }
+  }
+
+  async function autoDetectAndConnect() {
+    triggerHaptic(30);
+    // Prioritize HTTPS Cloudflare Tunnel for secure context (Microphone + Camera)
+    const endpoints = [
+      FIXED_CLOUDFLARE_URL,
+      serverBaseUrl,
+      FIXED_WIFI_URL,
+      FIXED_TAILSCALE_URL
+    ].filter(Boolean);
+
+    for (const ep of endpoints) {
+      try {
+        const start = Date.now();
+        const res = await fetch(`${ep}/api/status`, { cache: "no-store" });
+        if (res.ok) {
+          const latency = Date.now() - start;
+          serverBaseUrl = ep;
+          localStorage.setItem("zenesis_server_url", ep);
+          let modeStr = `DIRECT (${latency}ms)`;
+          if (ep.includes("trycloudflare.com")) modeStr = `CLOUD QUIC (${latency}ms)`;
+          else if (ep.includes("100.")) modeStr = `TAILSCALE (${latency}ms)`;
+          else if (ep.includes("192.168.")) modeStr = `WI-FI (${latency}ms)`;
+          setStatusIndicator(true, modeStr);
+          initSSEStream();
+          // OTA Hot-Reload: if inside APK file:// assets or insecure http, seamlessly open secure HTTPS tunnel
+          if ((window.location.protocol === "file:" || window.location.protocol === "http:") && ep.startsWith("https://")) {
+            setTimeout(() => {
+              window.location.replace(`${ep}/app?ota=secure&t=${Date.now()}`);
+            }, 250);
+          } else if (window.location.protocol === "file:" && ep.startsWith("http")) {
+            setTimeout(() => {
+              window.location.replace(`${ep}/app?ota=live&t=${Date.now()}`);
+            }, 250);
+          }
+          return;
+        }
+      } catch(e) {}
+    }
+    setStatusIndicator(false, "OFFLINE");
+  }
+
+  // ================= SSE STREAMING =================
+  function initSSEStream() {
+    if (sseSource) {
+      try { sseSource.close(); } catch(e) {}
+    }
+    try {
+      sseSource = new EventSource(`${serverBaseUrl}/api/stream`);
+      sseSource.addEventListener("chat_message", (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          renderSingleMessage(msg, true);
+        } catch(err) {}
+      });
+      sseSource.addEventListener("chat_cleared", () => {
+        const box = document.getElementById("chatScroll");
+        if (box) box.innerHTML = "";
+        triggerToast("🗑️ Conversație ștearsă!");
+      });
+      // 🚀 OTA LIVE HOT-RELOAD PUSH FROM PC
+      sseSource.addEventListener("ota_reload", () => {
+        triggerToast("🚀 Actualizare OTA aplicată!");
+        triggerHaptic(50);
+        setTimeout(() => {
+          const apiBase = serverBaseUrl || (window.location.protocol.startsWith("http") ? window.location.origin : "");
+          window.location.replace(`${apiBase}/app?ota=live&t=${Date.now()}`);
+        }, 300);
+      });
+      // ⚡ LIVE OPERATIONS: Evenimente în timp real transmise de pe PC
+      sseSource.addEventListener("agent_start", (e) => {
+        try {
+          const d = JSON.parse(e.data);
+          startWorkingIndicator("Kitty lucrează pe PC...");
+        } catch(err) {}
+      });
+      sseSource.addEventListener("agent_action", (e) => {
+        try {
+          const d = JSON.parse(e.data);
+          updateWorkingActions(d);
+        } catch(err) {}
+      });
+      sseSource.addEventListener("agent_done", (e) => {
+        try {
+          stopWorkingIndicator();
+        } catch(err) {}
+      });
+      // Sincronizare stare voce în timp real pe toate dispozitivele
+      sseSource.addEventListener("voice_target_changed", (e) => {
+        try {
+          const d = JSON.parse(e.data);
+          if (d.target === "mute") {
+            phoneVoiceOn = false;
+            pcVoiceOn = false;
+            stopActiveSpeech();
+          } else if (d.target === "pc") {
+            pcVoiceOn = true;
+            phoneVoiceOn = false;
+          } else if (d.target === "phone") {
+            phoneVoiceOn = true;
+            pcVoiceOn = false;
+          }
+          localStorage.setItem("zenesis_phone_voice", phoneVoiceOn);
+          localStorage.setItem("zenesis_pc_voice", pcVoiceOn);
+          updateVoiceButtonsUI();
+        } catch(err) {}
+      });
+      sseSource.onopen = () => setStatusIndicator(true, "DIRECT P2P");
+    } catch(e) {
+      console.warn("SSE init error:", e);
+    }
+  }
+
+  // ================= CLEPSIDRĂ ⏳ & TYPEWRITER ENGINE =================
+  let workingStartTime = 0;
+  let workingTimerInterval = null;
+
+  function formatMarkdown(text) {
+    if (!text) return "";
+    let safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    
+    // Code blocks ```...```
+    if (safe.includes("```")) {
+      const parts = safe.split("```");
+      let out = "";
+      for (let i = 0; i < parts.length; i++) {
+        if (i % 2 === 1) {
+          out += `<div class="terminal-box">${parts[i].trim()}</div>`;
+        } else {
+          out += parts[i].replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+        }
+      }
+      return out;
+    }
+    // Auto-close unclosed ** during streaming
+    const boldCount = (safe.match(/\*\*/g) || []).length;
+    if (boldCount % 2 === 1) {
+      safe += "**";
+    }
+    // Bold **...**
+    safe = safe.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    // Line breaks
+    safe = safe.replace(/\n/g, '<br>');
+    return safe;
+  }
+
+  // ================= SMART SCROLL GUARD // PREVINE SALTUL SCROLL-ULUI CÂND CITEȘTI =================
+  let userIsScrolling = false;
+
+  function initChatScrollGuard() {
+    const box = document.getElementById("chatScroll");
+    if (!box) return;
+
+    box.addEventListener("scroll", () => {
+      // Dacă distanța față de fundul paginii este mai mare de 70px, utilizatorul citește!
+      const distFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
+      userIsScrolling = distFromBottom > 70;
+    }, { passive: true });
+
+    // La atingere tactilă sau rotiță mouse, blocăm instant saltul automat
+    box.addEventListener("touchstart", () => {
+      const distFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
+      userIsScrolling = distFromBottom > 70;
+    }, { passive: true });
+
+    box.addEventListener("wheel", () => {
+      const distFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
+      userIsScrolling = distFromBottom > 70;
+    }, { passive: true });
+  }
+
+  function scrollChatToBottom(smooth = true, force = false) {
+    const box = document.getElementById("chatScroll");
+    if (!box) return;
+
+    // DACĂ MASTER CITEȘTE SAU A DERULAT ÎN SUS, NU MAI SĂRIM SCROLL-UL!
+    if (userIsScrolling && !force) return;
+
+    if (smooth) {
+      box.scrollTo({ top: box.scrollHeight, behavior: "smooth" });
+    } else {
+      box.scrollTop = box.scrollHeight;
+    }
+  }
+
+  // Pornim ascultătorul de scroll de îndată ce este gata pagina
+  setTimeout(initChatScrollGuard, 150);
+
+  // ================= LIVE AGENT OPERATIONS ENGINE =================
+  let liveAgentActions = [];
+  let liveActionPollInterval = null;
+
+  function getStepPrefix(act) {
+    const t = String((act && (act.type || act.name)) || '').toLowerCase();
+    if (t.includes('run_command')) return '✓ Ran';
+    if (t.includes('view') || t.includes('read')) return '✓ Explored';
+    if (t.includes('replace') || t.includes('write')) return '✓ Modified';
+    if (t.includes('grep') || t.includes('find') || t.includes('search')) return '✓ Searched';
+    return '✓ Executed';
+  }
+
+    function renderLiveOpsBox(actions, activeItem) {
+    const current = activeItem || (actions && actions.length > 0 ? actions[actions.length - 1] : null);
+    const cleanTitle = current ? ((current.title || current.name || 'Execut operație...').replace(/</g, '&lt;').replace(/>/g, '&gt;')) : 'Kitty lucrează pe PC...';
+    return `<div style="font-size:10px; color:#c084fc; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"><span style="color:#22c55e;">⚡</span> ${cleanTitle}</div>`;
+  }
+
+  function updateWorkingActions(data) {
+    if (!data) return;
+    if (data.actions && data.actions.length > 0) {
+      liveAgentActions = data.actions;
+    }
+    const chip = document.getElementById("workingBubble");
+    const latestItem = data.latest || (liveAgentActions.length > 0 ? liveAgentActions[liveAgentActions.length - 1] : null);
+    const activeTitle = latestItem ? (latestItem.title || latestItem.name || "Operație în curs...") : "Kitty execută operații pe PC...";
+
+    if (chip) {
+      const opsContainer = document.getElementById("workingOpsContainer");
+      if (opsContainer) {
+        opsContainer.innerHTML = renderLiveOpsBox(liveAgentActions, data.latest);
+        scrollChatToBottom(false);
+      }
+      const titleEl = document.getElementById("workingTaskTitle");
+      if (titleEl && latestItem) {
+        titleEl.textContent = activeTitle;
+      }
+    } else if (data.working || data.active) {
+      startWorkingIndicator(activeTitle);
+      const opsContainer = document.getElementById("workingOpsContainer");
+      if (opsContainer) {
+        opsContainer.innerHTML = renderLiveOpsBox(liveAgentActions, data.latest);
+      }
+    }
+  }
+
+  function startWorkingIndicator(taskDesc = "Kitty lucrează pe PC...") {
+    if (!workingStartTime) workingStartTime = Date.now();
+    ensureWorkingBubbleAtBottom(taskDesc);
+    if (!workingTimerInterval) {
+      workingTimerInterval = setInterval(() => {
+        const chip = document.getElementById("workingBubble");
+        if (chip && workingStartTime > 0) {
+          const elapsed = Math.round((Date.now() - workingStartTime) / 1000);
+          const tSpan = chip.querySelector(".live-task-timer");
+          if (tSpan) tSpan.textContent = `${elapsed}s`;
+        }
+      }, 1000);
+    }
+    // Instant initial fetch
+    (async () => {
+      try {
+        const r = await fetch(`${serverBaseUrl}/api/agent/live_action`, { cache: "no-store" });
+        if (r.ok) {
+          const d = await r.json();
+          updateWorkingActions(d);
+        }
+      } catch(e) {}
+    })();
+    // Live polling la fiecare 700ms
+    if (!liveActionPollInterval) {
+      liveActionPollInterval = setInterval(async () => {
+        try {
+          const r = await fetch(`${serverBaseUrl}/api/agent/live_action`, { cache: "no-store" });
+          if (r.ok) {
+            const d = await r.json();
+            updateWorkingActions(d);
+          }
+        } catch(e) {}
+      }, 700);
+    }
+  }
+
+  function ensureWorkingBubbleAtBottom(taskDesc = "Kitty lucrează pe PC...") {
+    const box = document.getElementById("chatScroll");
+    if (!box) return;
+    let chip = document.getElementById("workingBubble");
+    if (!chip) {
+      chip = document.createElement("div");
+      chip.id = "workingBubble";
+      chip.style.cssText = `
+        margin: 4px auto;
+        padding: 5px 10px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(8, 12, 22, 0.98) 100%);
+        border: 1.5px solid rgba(56, 189, 248, 0.45);
+        border-top: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.25);
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - 24px);
+        max-width: 500px;
+        animation: nodeSpawn 0.25s ease;
+        z-index: 5;
+        box-sizing: border-box;
+      `;
+      const elapsed = workingStartTime > 0 ? Math.round((Date.now() - workingStartTime) / 1000) : 0;
+      chip.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+          <div style="display:flex; align-items:center; gap:6px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+            <span style="font-size:13px; display:inline-block; animation: spin-clepsidra 2s linear infinite;">⏳</span>
+            <span id="workingTaskTitle" style="font-size:11px; font-weight:800; color:#38bdf8; overflow:hidden; text-overflow:ellipsis;">${taskDesc}</span>
+          </div>
+          <span class="live-task-timer" style="font-size:9.5px; font-weight:900; color:#fff; background:rgba(0, 242, 254, 0.25); border:1px solid rgba(0, 242, 254, 0.4); padding:0 6px; border-radius:10px; flex-shrink:0;">${elapsed}s</span>
+        </div>
+        <div id="workingOpsContainer" style="width:100%;">
+          ${renderLiveOpsBox(liveAgentActions, null)}
+        </div>
+      `;
+      box.appendChild(chip);
+    } else {
+      box.appendChild(chip);
+    }
+    scrollChatToBottom(false);
+  }
+
+  function stopWorkingIndicator() {
+    if (workingTimerInterval) {
+      clearInterval(workingTimerInterval);
+      workingTimerInterval = null;
+    }
+    if (liveActionPollInterval) {
+      clearInterval(liveActionPollInterval);
+      liveActionPollInterval = null;
+    }
+    const elapsed = workingStartTime > 0 ? ((Date.now() - workingStartTime) / 1000).toFixed(1) : null;
+    workingStartTime = 0;
+    const chip = document.getElementById("workingBubble");
+    if (chip) chip.remove();
+    return elapsed;
+  }
+
+  function typewriterStream(container, fullText, onDone) {
+    if (!fullText) {
+      if (onDone) onDone();
+      return;
+    }
+
+    // Subtitle stream: split into words/tokens so it flows smoothly like live subtitles
+    const tokens = fullText.match(/\S+|\s+/g) || [fullText];
+    let tokenIndex = 0;
+    const totalTokens = tokens.length;
+
+    // Subtitle tempo: 20ms - 32ms per token for natural reading cadence
+    const intervalMs = totalTokens > 200 ? 18 : (totalTokens > 80 ? 25 : 32);
+
+    container.innerHTML = '<span class="typing-cursor">▌</span>';
+    scrollChatToBottom(false);
+
+    let active = true;
+    container.onclick = () => {
+      // Tap bubble to reveal full text immediately
+      active = false;
+      container.innerHTML = formatMarkdown(fullText);
+      scrollChatToBottom(true);
+      if (onDone) onDone();
+    };
+
+    let currentText = "";
+    function step() {
+      if (!active) return;
+      if (tokenIndex < totalTokens) {
+        currentText += tokens[tokenIndex];
+        tokenIndex++;
+
+        container.innerHTML = formatMarkdown(currentText) + '<span class="typing-cursor">▌</span>';
+        scrollChatToBottom(false);
+        setTimeout(step, intervalMs);
+      } else {
+        container.innerHTML = formatMarkdown(fullText);
+        scrollChatToBottom(true);
+        if (onDone) onDone();
+      }
+    }
+    setTimeout(step, intervalMs);
+  }
+
+  
+  // ================= PRO FEATURE SUITE: VOICE, TTS, MEDIA, LIGHTBOX, THEMES =================
+  // 🔑 2 flaguri INDEPENDENTE — fiecare difuzor are ON/OFF propriu
+  const savedPhoneVoice = localStorage.getItem("zenesis_phone_voice");
+  let phoneVoiceOn = (savedPhoneVoice === null || savedPhoneVoice === "true"); // Difuzor Mobil activ implicit
+  let pcVoiceOn    = (localStorage.getItem("zenesis_pc_voice")    === "true"); // Difuzor PC
+  // Compatibilitate cu voiceTarget vechi (pentru playNextSpeechChunk)
+  let voiceTarget = phoneVoiceOn ? "phone" : (pcVoiceOn ? "pc" : "mute");
+  let recognition = null;
+  let isRecordingVoice = false;
+  let currentLightboxPath = "";
+  let cachedRoVoice = null;
+  let activePhoneAudio = null;
+
+  // 🔑 DETECȚIE DISPOZITIV — audio "phone" se redă DOAR pe mobil
+  const isMobileDevice = (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    typeof window.AndroidBridge !== "undefined" ||
+    typeof window.android !== "undefined" ||
+    (navigator.maxTouchPoints > 1 && /Android/i.test(navigator.userAgent))
+  );
+  console.log(`[KITTY VOICE] Device: ${isMobileDevice ? "📱 MOBIL" : "💻 PC"} | Phone:${phoneVoiceOn} | PC:${pcVoiceOn}`);
+  let activeSpeechQueue = [];
+  let isSpeechQueuePlaying = false;
+  let currentSpeechGenerationId = 0;
+
+  function cleanSpeechText(raw) {
+    if (!raw) return "";
+    let t = raw.replace(/```[\s\S]*?```/g, " am atașat un bloc de cod ");
+    t = t.replace(/https?:\S+/g, "");
+    t = t.replace(/[*_~#|\[\]\(\)>`]/g, " ");
+    t = t.split(/\r?\n/).map(l => l.trim()).filter(Boolean).join(" ");
+    return t.replace(/\s+/g, " ").trim();
+  }
+
+  function splitIntoSpeechChunks(text, maxChars = 320) {
+    const cleaned = cleanSpeechText(text);
+    if (!cleaned) return [];
+    // Împărțire naturală pe propoziții și fraze
+    const sentences = cleaned.split(/(?<=[.!?…])\s+/);
+    const chunks = [];
+    let curr = "";
+    for (let s of sentences) {
+      s = s.trim();
+      if (!s) continue;
+      if ((curr.length + s.length + 1) <= maxChars) {
+        curr = curr ? `${curr} ${s}` : s;
+      } else {
+        if (curr) chunks.push(curr);
+        if (s.length > maxChars) {
+          const words = s.split(" ");
+          let sub = "";
+          for (let w of words) {
+            if ((sub.length + w.length + 1) <= maxChars) {
+              sub = sub ? `${sub} ${w}` : w;
+            } else {
+              if (sub) chunks.push(sub);
+              sub = w;
+            }
+          }
+          curr = sub;
+        } else {
+          curr = s;
+        }
+      }
+    }
+    if (curr) chunks.push(curr);
+    return chunks;
+  }
+
+  function updateVoices() {
+    if (!("speechSynthesis" in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    cachedRoVoice = voices.find(v => (v.lang && (v.lang.startsWith("ro") || v.lang.includes("RO"))) || (v.name && (v.name.toLowerCase().includes("romanian") || v.name.toLowerCase().includes("romana")))) || null;
+  }
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = updateVoices;
+    updateVoices();
+  }
+
+  function updateVoiceButtonsUI() {
+    const btnPhone = document.getElementById("btnVoicePhone");
+    const btnPc = document.getElementById("btnVoicePc");
+    const icon = document.getElementById("ttsIcon");
+
+    // Buton MOBIL
+    if (btnPhone) {
+      if (phoneVoiceOn) {
+        btnPhone.style.background = "linear-gradient(180deg, #059669 0%, #047857 100%)";
+        btnPhone.style.borderColor = "var(--neon-emerald)";
+        btnPhone.style.boxShadow = "0 0 14px var(--emerald-glow)";
+        btnPhone.style.color = "#ffffff";
+        btnPhone.textContent = "📱 MOBIL DIF: ON 🔊";
+      } else {
+        btnPhone.style.background = "rgba(255,255,255,0.06)";
+        btnPhone.style.borderColor = "rgba(255,255,255,0.16)";
+        btnPhone.style.boxShadow = "none";
+        btnPhone.style.color = "var(--text-secondary)";
+        btnPhone.textContent = "📱 MOBIL DIF: OFF 🔇";
+      }
+    }
+
+    // Buton PC
+    if (btnPc) {
+      if (pcVoiceOn) {
+        btnPc.style.background = "linear-gradient(180deg, #0284c7 0%, #0369a1 100%)";
+        btnPc.style.borderColor = "var(--neon-cyan)";
+        btnPc.style.boxShadow = "0 0 14px var(--cyan-glow)";
+        btnPc.style.color = "#ffffff";
+        btnPc.textContent = "💻 PC DIF: ON 🔊";
+      } else {
+        btnPc.style.background = "rgba(255,255,255,0.06)";
+        btnPc.style.borderColor = "rgba(255,255,255,0.16)";
+        btnPc.style.boxShadow = "none";
+        btnPc.style.color = "var(--text-secondary)";
+        btnPc.textContent = "💻 PC DIF: OFF 🔇";
+      }
+    }
+
+    // Icoana din TTS bar
+    if (icon) {
+      if (phoneVoiceOn && pcVoiceOn) icon.textContent = "🔊";
+      else if (phoneVoiceOn) icon.textContent = "📱";
+      else if (pcVoiceOn) icon.textContent = "💻";
+      else icon.textContent = "🔇";
+    }
+  }
+
+  // Toggle INDEPENDENT difuzor mobil
+  function togglePhoneVoice() {
+    triggerHaptic(30);
+    phoneVoiceOn = !phoneVoiceOn;
+    localStorage.setItem("zenesis_phone_voice", phoneVoiceOn);
+    voiceTarget = phoneVoiceOn ? "phone" : (pcVoiceOn ? "pc" : "mute");
+    updateVoiceButtonsUI();
+    if (phoneVoiceOn) {
+      // Deblocare permisiune Audio / Autoplay în browsere mobile prin gest direct al utilizatorului
+      try {
+        const unlockAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+        unlockAudio.play().catch(() => {});
+      } catch(e) {}
+      if ("speechSynthesis" in window) {
+        try {
+          const uSilence = new SpeechSynthesisUtterance(" ");
+          uSilence.volume = 0.01;
+          window.speechSynthesis.speak(uSilence);
+        } catch(e) {}
+      }
+      triggerToast("📱 Difuzor MOBIL: PORNIT 🔊");
+      try { fetch(`${serverBaseUrl}/api/voice/target`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({target:"phone", phone:true}) }).catch(()=>{}); } catch(e) {}
+      speakTextWithKitty("Vocea pe difuzorul telefonului este activată, Master Nikolas!");
+    } else {
+      triggerToast("📱 Difuzor MOBIL: OPRIT 🔇");
+      stopActiveSpeech();
+      try { fetch(`${serverBaseUrl}/api/voice/target`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({target: pcVoiceOn ? "pc" : "mute", phone:false}) }).catch(()=>{}); } catch(e) {}
+    }
+  }
+
+  // Toggle INDEPENDENT difuzor PC
+  function togglePcVoice() {
+    triggerHaptic(30);
+    pcVoiceOn = !pcVoiceOn;
+    localStorage.setItem("zenesis_pc_voice", pcVoiceOn);
+    voiceTarget = phoneVoiceOn ? "phone" : (pcVoiceOn ? "pc" : "mute");
+    updateVoiceButtonsUI();
+    if (pcVoiceOn) {
+      triggerToast("💻 Difuzor PC: PORNIT 🔊");
+      try { fetch(`${serverBaseUrl}/api/voice/target`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({target:"pc", pc:true}) }).catch(()=>{}); } catch(e) {}
+      if (serverBaseUrl) {
+        fetch(`${serverBaseUrl}/api/voice/speak?text=${encodeURIComponent("Vocea pe difuzoarele PC este activată, Master Nikolas!")}`).catch(() => {});
+      }
+    } else {
+      triggerToast("💻 Difuzor PC: OPRIT 🔇");
+      try {
+        fetch(`${serverBaseUrl}/api/voice/target`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({target: phoneVoiceOn ? "phone" : "mute", pc:false}) }).catch(()=>{});
+        fetch(`${serverBaseUrl}/api/voice/stop`, { method:"POST" }).catch(()=>{});
+      } catch(e) {}
+    }
+  }
+
+  // Compatibilitate veche
+  function setVoiceTarget(target) { if (target === "phone") togglePhoneVoice(); else if (target === "pc") togglePcVoice(); }
+  function toggleTtsVoice() { togglePhoneVoice(); }
+
+  function stopActiveSpeech() {
+    currentSpeechGenerationId++;
+    activeSpeechQueue = [];
+    isSpeechQueuePlaying = false;
+    if (activePhoneAudio) {
+      try {
+        activePhoneAudio.pause();
+        activePhoneAudio.currentTime = 0;
+      } catch(e) {}
+      activePhoneAudio = null;
+    }
+    if (window.AndroidBridge && typeof window.AndroidBridge.stopNeuralVoice === "function") {
+      try { window.AndroidBridge.stopNeuralVoice(); } catch(e) {}
+    }
+    if ("speechSynthesis" in window) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+    }
+  }
+
+  function stopVoiceNow() {
+    triggerHaptic(60);
+    phoneVoiceOn = false;
+    pcVoiceOn = false;
+    localStorage.setItem("zenesis_phone_voice", "false");
+    localStorage.setItem("zenesis_pc_voice", "false");
+    voiceTarget = "mute";
+    updateVoiceButtonsUI();
+
+    stopActiveSpeech();
+    try {
+      fetch(`${serverBaseUrl}/api/voice/stop`, { method: "POST" }).catch(() => {});
+      fetch(`${serverBaseUrl}/api/voice/target`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ target: "mute", phone: false, pc: false }) }).catch(() => {});
+    } catch(e) {}
+    triggerToast("🛑 TOATE VOCILE AU FOST OPRITE!");
+
+    const btn = document.getElementById("btnStopVoice");
+    if (btn) {
+      btn.style.transform = "scale(0.93)";
+      btn.textContent = "✅ TOATE OPRITE!";
+      setTimeout(() => {
+        btn.style.transform = "";
+        btn.textContent = "🛑 OPREȘTE TOT";
+      }, 1400);
+    }
+  }
+
+  function playNextSpeechChunk(genId) {
+    if (genId !== currentSpeechGenerationId) return;
+    if (!phoneVoiceOn || activeSpeechQueue.length === 0) {
+      isSpeechQueuePlaying = false;
+      return;
+    }
+
+    isSpeechQueuePlaying = true;
+    const currentChunk = activeSpeechQueue.shift();
+    if (!currentChunk) {
+      isSpeechQueuePlaying = false;
+      return;
+    }
+
+
+
+    const audioUrl = `${serverBaseUrl}/api/voice/audio?text=${encodeURIComponent(currentChunk)}&v=${Date.now()}`;
+
+    // Opțiunea A: Redare nativă AndroidBridge dacă este disponibil
+    if (window.AndroidBridge && typeof window.AndroidBridge.playNeuralVoice === "function") {
+      try {
+        window.AndroidBridge.playNeuralVoice(audioUrl);
+        const waitMs = Math.max(1200, currentChunk.length * 68);
+        setTimeout(() => {
+          if (genId === currentSpeechGenerationId) playNextSpeechChunk(genId);
+        }, waitMs);
+        return;
+      } catch(e) {
+        console.warn("Bridge playNeuralVoice error:", e);
+      }
+    }
+
+    // Opțiunea B: Redare HTML5 Audio cu fallback imediat pe SpeechSynthesis
+    function fallbackSynthesize() {
+      if (window.AndroidBridge && typeof window.AndroidBridge.speak === "function") {
+        try {
+          window.AndroidBridge.speak(currentChunk);
+          const waitMs = Math.max(1200, currentChunk.length * 68);
+          setTimeout(() => {
+            if (genId === currentSpeechGenerationId) playNextSpeechChunk(genId);
+          }, waitMs);
+          return;
+        } catch(e) {}
+      }
+      if ("speechSynthesis" in window) {
+        try {
+          const u = new SpeechSynthesisUtterance(currentChunk);
+          if (cachedRoVoice) u.voice = cachedRoVoice;
+          u.lang = "ro-RO";
+          u.rate = 1.0;
+          u.pitch = 1.05;
+          u.onend = () => {
+            if (genId === currentSpeechGenerationId) {
+              setTimeout(() => playNextSpeechChunk(genId), 70);
+            }
+          };
+          u.onerror = () => {
+            if (genId === currentSpeechGenerationId) {
+              setTimeout(() => playNextSpeechChunk(genId), 100);
+            }
+          };
+          window.speechSynthesis.speak(u);
+          return;
+        } catch(e) {
+          console.warn("SpeechSynthesis error:", e);
+        }
+      }
+      if (genId === currentSpeechGenerationId) {
+        setTimeout(() => playNextSpeechChunk(genId), 120);
+      }
+    }
+
+    try {
+      if (activePhoneAudio) {
+        try { activePhoneAudio.pause(); } catch(e) {}
+        activePhoneAudio = null;
+      }
+      activePhoneAudio = new Audio(audioUrl);
+      activePhoneAudio.preload = "auto";
+      activePhoneAudio.onended = () => {
+        if (genId === currentSpeechGenerationId) {
+          setTimeout(() => playNextSpeechChunk(genId), 70);
+        }
+      };
+      activePhoneAudio.onerror = (e) => {
+        console.warn("HTML5 audio error, falling back to speech synthesis:", e);
+        fallbackSynthesize();
+      };
+      const playPromise = activePhoneAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn("HTML5 play() rejected by mobile autoplay policy, activating voice fallback:", err);
+          fallbackSynthesize();
+        });
+      }
+    } catch(e) {
+      console.warn("HTML5 audio exception:", e);
+      fallbackSynthesize();
+    }
+  }
+
+  function speakTextWithKitty(text) {
+    if (!text) return;
+    if (!phoneVoiceOn && !pcVoiceOn) return;
+    stopActiveSpeech();
+
+    // 1. Redă pe difuzoarele PC dacă este pornit
+    if (pcVoiceOn) {
+      const clean = cleanSpeechText(text);
+      if (clean && serverBaseUrl) {
+        fetch(`${serverBaseUrl}/api/voice/speak?text=${encodeURIComponent(clean)}`).catch(() => {});
+      }
+    }
+
+    // 2. Redă pe difuzorul Mobil
+    if (phoneVoiceOn) {
+      const chunks = splitIntoSpeechChunks(text, 300);
+      if (chunks && chunks.length > 0) {
+        activeSpeechQueue = chunks;
+        const thisGen = currentSpeechGenerationId;
+        playNextSpeechChunk(thisGen);
+      }
+    }
+  }
+
+  // Callback declanșat de MediaPlayer din APK când un fragment vocal se încheie
+  window.onNativeNeuralVoiceEnded = function() {
+    if (voiceTarget === "phone" && isSpeechQueuePlaying) {
+      setTimeout(() => {
+        playNextSpeechChunk(currentSpeechGenerationId);
+      }, 50);
+    }
+  };
+
+  // Initialize UI buttons state on load
+  setTimeout(updateVoiceButtonsUI, 100);
+
+  // Callback pentru recunoașterea vocală nativă Android din APK (Google Recognizer Dialog)
+  window.onAndroidVoiceResult = function(spokenText) {
+    if (!spokenText) return;
+    const input = document.getElementById("chatInput");
+    if (!input) return;
+    const current = input.value.trim();
+    input.value = current ? (current + " " + spokenText.trim()) : spokenText.trim();
+    triggerToast("🎙️ Mesaj vocal preluat! Trimit...");
+    triggerHaptic(35);
+    setTimeout(() => {
+      sendChatMessage();
+    }, 250);
+  };
+  window.onNativeSpeechResult = window.onAndroidVoiceResult;
+
+  // 2. Multi-Tier Voice Dictation Engine (Android Google Voice Intent + Web Speech API + Gemini Neural STT)
+  let speechRecognitionInstance = null;
+  let isDictating = false;
+  let dictationBaseText = "";
+  let mediaRecorderInstance = null;
+  let audioChunks = [];
+  let voiceSilenceTimer = null;
+  let isTranscribingVoice = false;
+
+  function initSpeechRecognition() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) return null;
+
+    const rec = new SpeechRec();
+    rec.lang = "ro-RO"; // Limba Română
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = function() {
+      isDictating = true;
+      const micBtn = document.getElementById("btnVoiceMic");
+      if (micBtn) micBtn.classList.add("listening");
+      triggerToast("🎙️ Te ascult, Master Nikolas! Vorbește în română...");
+      triggerHaptic(25);
+    };
+
+    rec.onresult = function(event) {
+      const input = document.getElementById("chatInput");
+      if (!input) return;
+
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const text = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          dictationBaseText = dictationBaseText ? (dictationBaseText + " " + text.trim()) : text.trim();
+        } else {
+          interim += text;
+        }
+      }
+      input.value = dictationBaseText + (interim ? (dictationBaseText ? " " : "") + interim : "");
+    };
+
+    rec.onerror = function(event) {
+      console.warn("[SPEECH REC ERROR]:", event.error);
+      if (event.error === "no-speech") {
+        if (isDictating) {
+          try { rec.start(); return; } catch(e) {}
+        }
+        return;
+      }
+      if (event.error === "not-allowed") {
+        triggerToast("⚠️ Te rog permite accesul la microfon!");
+      } else if (event.error !== "aborted") {
+        triggerToast("Status microfon: " + event.error);
+      }
+      opresteDictare();
+    };
+
+    rec.onend = function() {
+      isDictating = false;
+      const micBtn = document.getElementById("btnVoiceMic");
+      if (micBtn) micBtn.classList.remove("listening");
+      speechRecognitionInstance = null;
+      const input = document.getElementById("chatInput");
+      if (input && input.value.trim().length > 0) {
+        triggerToast("🎙️ Trimit direct către Kitty...");
+        triggerHaptic(30);
+        setTimeout(() => {
+          sendChatMessage();
+        }, 250);
+      }
+    };
+
+    return rec;
+  }
+
+  function pornesteDictare() {
+    const input = document.getElementById("chatInput");
+    dictationBaseText = input ? input.value.trim() : "";
+    try {
+      if (speechRecognitionInstance) {
+        try { speechRecognitionInstance.abort(); } catch(e) {}
+      }
+    } catch(e) {}
+    speechRecognitionInstance = initSpeechRecognition();
+    if (speechRecognitionInstance) {
+      try {
+        speechRecognitionInstance.start();
+      } catch(e) {
+        console.warn("SpeechRec start error:", e);
+        startNeuralMediaRecorder();
+      }
+    } else {
+      startNeuralMediaRecorder();
+    }
+  }
+
+  function opresteDictare() {
+    isDictating = false;
+    if (speechRecognitionInstance) {
+      try { speechRecognitionInstance.stop(); } catch(e) {}
+      speechRecognitionInstance = null;
+    }
+    const micBtn = document.getElementById("btnVoiceMic");
+    if (micBtn) micBtn.classList.remove("listening");
+  }
+
+  function toggleVoiceDictation() {
+    triggerHaptic(35);
+    const micBtn = document.getElementById("btnVoiceMic");
+    const input = document.getElementById("chatInput");
+
+    if (isTranscribingVoice) return;
+
+    // A. Recunoaștere Vocală Nativă Google în APK (AndroidBridge -> Google Voice Assistant Dialog)
+    if (window.AndroidBridge && typeof window.AndroidBridge.startVoiceRecognition === "function") {
+      try {
+        window.AndroidBridge.startVoiceRecognition();
+        triggerToast("🎙️ Te ascult, Master Nikolas! Dictează în română...");
+        return;
+      } catch(e) {
+        console.warn("AndroidBridge startVoiceRecognition error, fallback:", e);
+      }
+    }
+
+    // B. Web Speech API (pentru Mobile Chrome / PC Browser - deschide pop-up Google Voice pe Android)
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      if (isDictating) {
+        opresteDictare();
+        triggerToast("🛑 Dictare oprită. Poți apăsa ➤ Trimite!");
+      } else {
+        pornesteDictare();
+      }
+      return;
+    }
+
+    // C. Dacă MediaRecorder este deja activ, oprește-l și transcrie
+    if (mediaRecorderInstance && mediaRecorderInstance.state === "recording") {
+      stopNeuralMediaRecorder();
+      return;
+    }
+
+    // D. Fallback universal: MediaRecorder + Gemini Neural STT
+    startNeuralMediaRecorder();
+  }
+
+  async function startNeuralMediaRecorder() {
+    const micBtn = document.getElementById("btnVoiceMic");
+    const input = document.getElementById("chatInput");
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      if (window.location.protocol !== "https:" && FIXED_CLOUDFLARE_URL) {
+        triggerToast("🔒 Conectare pe canal securizat HTTPS pentru microfon...");
+        setTimeout(() => {
+          window.location.replace(`${FIXED_CLOUDFLARE_URL}/app?mic=auto`);
+        }, 350);
+        return;
+      }
+      const audioFallback = document.getElementById("audioFallbackInput");
+      if (audioFallback) {
+        triggerToast("🎙️ Deschidere recorder vocal nativ...");
+        audioFallback.click();
+        return;
+      }
+      triggerToast("🎙️ Activează permisiunea microfonului în setările browserului");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+
+      let mimeType = "audio/webm";
+      if (typeof MediaRecorder.isTypeSupported === "function") {
+        if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+          mimeType = "audio/webm;codecs=opus";
+        } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          mimeType = "audio/mp4";
+        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
+          mimeType = "audio/ogg";
+        }
+      }
+
+      mediaRecorderInstance = new MediaRecorder(stream, { mimeType: mimeType.split(";")[0] });
+
+      mediaRecorderInstance.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
+      };
+
+      mediaRecorderInstance.onstart = () => {
+        isRecordingVoice = true;
+        if (micBtn) micBtn.classList.add("listening");
+        triggerToast("🎙️ Vorbește acum, Master Nikolas...");
+
+        if (voiceSilenceTimer) clearTimeout(voiceSilenceTimer);
+        voiceSilenceTimer = setTimeout(() => {
+          if (mediaRecorderInstance && mediaRecorderInstance.state === "recording") {
+            stopNeuralMediaRecorder();
+          }
+        }, 8000);
+      };
+
+      mediaRecorderInstance.onstop = async () => {
+        if (voiceSilenceTimer) clearTimeout(voiceSilenceTimer);
+        stream.getTracks().forEach(track => track.stop());
+        isRecordingVoice = false;
+        if (micBtn) {
+          micBtn.classList.remove("listening");
+          micBtn.classList.add("transcribing");
+        }
+        isTranscribingVoice = true;
+        triggerToast("⏳ Transcriere neurală vocală...");
+
+        try {
+          const audioBlob = new Blob(audioChunks, { type: mimeType.split(";")[0] });
+          if (audioBlob.size < 120) {
+            triggerToast("⚠️ Audio prea scurt");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            try {
+              const base64Data = reader.result.split(",")[1];
+              const apiBase = serverBaseUrl || (window.location.protocol.startsWith("http") ? window.location.origin : FIXED_CLOUDFLARE_URL);
+              const res = await fetch(`${apiBase}/api/voice/transcribe`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  audio: base64Data,
+                  mimeType: mimeType.split(";")[0]
+                })
+              });
+              const data = await res.json();
+              if (data.status === "ok" && data.transcript) {
+                const current = input ? input.value.trim() : "";
+                if (input) {
+                  input.value = current ? (current + " " + data.transcript.trim()) : data.transcript.trim();
+                  input.focus();
+                }
+                triggerToast("🎙️ Trimit mesajul vocal...");
+                triggerHaptic(35);
+                scrollChatToBottom(false);
+                setTimeout(() => {
+                  sendChatMessage();
+                }, 250);
+              } else {
+                triggerToast("🎙️ Nu s-a distins niciun cuvânt clar");
+              }
+            } catch (postErr) {
+              console.error("Transcribe post error:", postErr);
+              triggerToast("Eroare server transcriere");
+            } finally {
+              isTranscribingVoice = false;
+              if (micBtn) micBtn.classList.remove("transcribing");
+            }
+          };
+          reader.readAsDataURL(audioBlob);
+        } catch (err) {
+          console.error("Transcribe process error:", err);
+          isTranscribingVoice = false;
+          if (micBtn) micBtn.classList.remove("transcribing");
+        }
+      };
+
+      mediaRecorderInstance.start(250);
+    } catch (err) {
+      console.error("getUserMedia error:", err);
+      // Fallback: file upload capture
+      const audioFallback = document.getElementById("audioFallbackInput");
+      if (audioFallback) {
+        audioFallback.click();
+      } else {
+        triggerToast("⚠️ Permisiune microfon blocată");
+      }
+      if (micBtn) micBtn.classList.remove("listening");
+    }
+  }
+
+  function stopNeuralMediaRecorder() {
+    if (mediaRecorderInstance && mediaRecorderInstance.state === "recording") {
+      mediaRecorderInstance.stop();
+    }
+  }
+
+  async function handleAudioFallbackFile(inputElem) {
+    if (!inputElem.files || !inputElem.files[0]) return;
+    const file = inputElem.files[0];
+    const micBtn = document.getElementById("btnVoiceMic");
+    const input = document.getElementById("chatInput");
+    if (micBtn) {
+      micBtn.classList.remove("listening");
+      micBtn.classList.add("transcribing");
+    }
+    triggerToast("⏳ Transcriere comandă vocală...");
+
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64Data = reader.result.split(",")[1];
+          const apiBase = serverBaseUrl || (window.location.protocol.startsWith("http") ? window.location.origin : FIXED_CLOUDFLARE_URL);
+          const res = await fetch(`${apiBase}/api/voice/transcribe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              audio: base64Data,
+              mimeType: file.type || "audio/mp3"
+            })
+          });
+          const data = await res.json();
+          if (data.status === "ok" && data.transcript) {
+            const current = input ? input.value.trim() : "";
+            if (input) {
+              input.value = current ? (current + " " + data.transcript.trim()) : data.transcript.trim();
+              input.focus();
+            }
+            triggerToast("🎙️ Trimit mesajul vocal...");
+            triggerHaptic(35);
+            scrollChatToBottom(false);
+            setTimeout(() => {
+              sendChatMessage();
+            }, 250);
+          } else {
+            triggerToast("🎙️ Nu s-a distins niciun cuvânt clar");
+          }
+        } catch (err) {
+          triggerToast("Eroare server transcriere");
+        } finally {
+          if (micBtn) micBtn.classList.remove("transcribing");
+          inputElem.value = "";
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      if (micBtn) micBtn.classList.remove("transcribing");
+      inputElem.value = "";
+    }
+  }
+
+  // 3. DJ Media Controller
+  function toggleDjModal() {
+    triggerHaptic(25);
+    const modal = document.getElementById("djMediaModal");
+    if (!modal) return;
+    modal.style.display = modal.style.display === "none" ? "block" : "none";
+  }
+
+  async function execMediaCmd(action) {
+    triggerHaptic(30);
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/media/control?action=${action}`);
+      const data = await res.json();
+      triggerToast(data.result || "Comandă trimisă la PC!");
+    } catch(e) {
+      triggerToast("Eroare comandă media PC");
+    }
+  }
+
+  // 4. Image Lightbox for Explorer
+  function openLightbox(filePath, fileName) {
+    triggerHaptic(30);
+    currentLightboxPath = filePath;
+    const overlay = document.getElementById("lightboxOverlay");
+    const img = document.getElementById("lightboxImg");
+    const title = document.getElementById("lightboxTitle");
+    const btnOpenPc = document.getElementById("btnLightboxOpenPc");
+    const btnDl = document.getElementById("btnLightboxDownload");
+
+    if (title) title.textContent = fileName || "Imagine";
+    if (img) img.src = `${serverBaseUrl}/api/fs/preview?path=${encodeURIComponent(filePath)}`;
+    if (btnOpenPc) btnOpenPc.onclick = () => openOnPcScreen(filePath);
+    if (btnDl) btnDl.onclick = () => downloadFileToDevice(filePath);
+
+    if (overlay) overlay.style.display = "flex";
+  }
+
+  function closeLightbox() {
+    triggerHaptic(20);
+    const overlay = document.getElementById("lightboxOverlay");
+    if (overlay) overlay.style.display = "none";
+    const img = document.getElementById("lightboxImg");
+    if (img) img.src = "";
+  }
+
+  // 5. Luxury Theme Cycling
+  const APP_THEMES = ["theme-cyber", "theme-gold", "theme-crimson"];
+  let currentThemeIdx = 0;
+
+  function cycleAppTheme() {
+    triggerHaptic(30);
+    currentThemeIdx = (currentThemeIdx + 1) % APP_THEMES.length;
+    document.body.className = APP_THEMES[currentThemeIdx];
+    localStorage.setItem("zenesis_theme", APP_THEMES[currentThemeIdx]);
+
+    const names = ["🌌 Cyberpunk Neon", "👑 Zenesis Obsidian & Gold", "🌹 Crimson Precinct Velvet"];
+    triggerToast(names[currentThemeIdx]);
+  }
+
+  // Restore saved theme
+  const savedTheme = localStorage.getItem("zenesis_theme");
+  if (savedTheme) {
+    document.body.className = savedTheme;
+    currentThemeIdx = APP_THEMES.indexOf(savedTheme) !== -1 ? APP_THEMES.indexOf(savedTheme) : 0;
+  }
+
+  // ================= CHAT LOGIC =================
+  function renderSingleMessage(msg, isLiveStream = false) {
+    if (!msg || !msg.text) return null;
+    if (msg.id && processedMessageIds.has(msg.id)) return null;
+    if (msg.id) processedMessageIds.add(msg.id);
+
+    const box = document.getElementById("chatScroll");
+    if (!box) return null;
+
+    const isMaster = msg.sender === "master";
+
+    // Stop working indicator when Kitty responds
+    let taskDuration = null;
+    if (!isMaster) {
+      taskDuration = stopWorkingIndicator();
+    }
+
+    const row = document.createElement("div");
+    row.className = `chat-node ${isMaster ? "master" : "kitty"}`;
+    if (msg.id) row.dataset.id = msg.id;
+    if (isMaster) row.dataset.text = (msg.text || "").trim();
+
+    const bubble = document.createElement("div");
+    bubble.className = "node-bubble-3d";
+
+    const hudInfo = document.createElement("div");
+    hudInfo.className = "node-hud-info";
+    hudInfo.innerHTML = `
+      <span>${msg.name || (isMaster ? "MASTER NIKOLAS" : "KITTY ELENA")}</span>
+      <span>${isMaster ? "✓✓ ZENESIS" : "AI CORE"}</span>
+    `;
+    bubble.appendChild(hudInfo);
+
+    const bodyDiv = document.createElement("div");
+    bodyDiv.className = "node-body-content";
+    bubble.appendChild(bodyDiv);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.className = "node-timestamp";
+    const timeText = msg.time || "Acum";
+    if (!isMaster && taskDuration) {
+      timeDiv.innerHTML = `<span class="task-duration-badge">⏱️ ${taskDuration}s</span>` + timeText;
+    } else {
+      timeDiv.textContent = timeText;
+    }
+    bubble.appendChild(timeDiv);
+
+    row.appendChild(bubble);
+    box.appendChild(row);
+
+    // If Master typed, immediately show Clepsidră ⏳
+    if (isMaster) {
+      bodyDiv.innerHTML = formatMarkdown(msg.text);
+      scrollChatToBottom(true);
+      startWorkingIndicator();
+    } else {
+      // Typewriter effect for live new messages from Kitty
+      if (isLiveStream) {
+        speakTextWithKitty(msg.text);
+        typewriterStream(bodyDiv, msg.text, () => {
+          scrollChatToBottom(true);
+        });
+      } else {
+        bodyDiv.innerHTML = formatMarkdown(msg.text);
+        scrollChatToBottom(false);
+      }
+    }
+    return row;
+  }
+
+  async function sendChatMessage() {
+    if (isDictating) {
+      opresteDictare();
+    }
+    const input = document.getElementById("chatInput");
+    if (!input) return;
+    const txt = input.value.trim();
+    if (!txt) return;
+
+    triggerHaptic(25);
+    input.value = "";
+
+    // Deblocare permisiune Audio / Autoplay pe gestul direct de trimitere al utilizatorului
+    if (phoneVoiceOn) {
+      try {
+        const preAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+        preAudio.play().catch(() => {});
+      } catch(e) {}
+    }
+
+    // Instant local preview + Clepsidră ⏳ starts
+    const tempId = "local-" + Date.now();
+    const rowNode = renderSingleMessage({
+      id: tempId,
+      sender: "master",
+      name: "MASTER NIKOLAS",
+      text: txt,
+      time: new Date().toLocaleTimeString().slice(0, 5)
+    }, false);
+    if (rowNode) rowNode.dataset.text = txt;
+    userIsScrolling = false;
+    scrollChatToBottom(true, true);
+
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: txt })
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      setTimeout(syncChatHistoryLog, 500);
+    } catch(e) {
+      triggerToast("⚠️ Conexiune: " + (e.message || "Rețea PC"));
+    }
+  }
+
+  function quickSend(cmd) {
+    document.getElementById("chatInput").value = cmd;
+    sendChatMessage();
+  }
+
+  async function syncChatHistoryLog() {
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/chat/sync?limit=60`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.messages && Array.isArray(data.messages)) {
+          const box = document.getElementById("chatScroll");
+          if (!box) return;
+
+          let hasNew = false;
+          for (const m of data.messages) {
+            if (!m || !m.text) continue;
+            if (m.id && processedMessageIds.has(m.id)) continue;
+
+            // Avoid duplicating message Master just sent locally
+            if (m.sender === "master") {
+              const cleanTxt = (m.text || "").trim();
+              const localMatch = box.querySelector(`.chat-node.master[data-text="${CSS.escape(cleanTxt)}"]`);
+              if (localMatch && !localMatch.dataset.synced) {
+                localMatch.dataset.synced = "true";
+                if (m.id) {
+                  processedMessageIds.add(m.id);
+                  localMatch.dataset.id = m.id;
+                }
+                continue;
+              }
+            }
+
+            // Dacă este o primire nouă (nu la prima încărcare a paginii), tratăm ca live stream
+            const shouldBeLive = hasInitialSyncCompleted && (m.sender !== "master");
+            renderSingleMessage(m, shouldBeLive);
+            hasNew = true;
+          }
+          hasInitialSyncCompleted = true;
+          if (hasNew) {
+            scrollChatToBottom(true);
+          }
+        }
+      }
+    } catch(e) {}
+  }
+
+  async function clearLiveChat() {
+    triggerHaptic(30);
+    processedMessageIds.clear();
+    const box = document.getElementById("chatScroll");
+    if (box) box.innerHTML = "";
+    try {
+      await fetch(`${serverBaseUrl}/api/chat/clear`, { method: "POST" });
+    } catch(e) {}
+  }
+
+  // ================= FILE EXPLORER =================
+  async function openDirectory(targetPath = "") {
+    const container = document.getElementById("fsContainer");
+    const breadcrumb = document.getElementById("fsBreadcrumb");
+    const btnParent = document.getElementById("btnGoParent");
+
+    try {
+      const url = `${serverBaseUrl}/api/fs/list?path=${encodeURIComponent(targetPath)}`;
+      const res = await fetch(url, { cache: "no-store" });
+      const data = await res.json();
+
+      if (data.error) {
+        triggerToast(data.error);
+        return;
+      }
+
+      currentDirectoryPath = data.current_path;
+      parentDirectoryPath = data.parent_path || "";
+      cachedExplorerItems = data.items || [];
+
+      if (breadcrumb) breadcrumb.textContent = data.is_root ? "Rădăcină PC & Partiții" : data.current_path;
+      if (btnParent) btnParent.style.display = data.is_root ? "none" : "inline-flex";
+
+      renderExplorerItems(cachedExplorerItems);
+    } catch(e) {
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--neon-rose); font-size:12px;">Eroare conectare la explorator PC</div>`;
+    }
+  }
+
+  function getItemVisualTheme(item) {
+    const isDir = item.is_dir || item.type === "shortcut" || item.type === "drive";
+    const n = (item.name || "").toLowerCase();
+    
+    if (isDir) {
+      if (n.includes("kitty casa") || n.includes("sanctuar kitty") || n === "kitty") {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(245, 158, 11, 0.24) 0%, rgba(217, 70, 239, 0.28) 100%)",
+          border: "rgba(250, 204, 21, 0.6)",
+          glow: "0 8px 24px rgba(245, 158, 11, 0.28)",
+          avatarBg: "linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "👑",
+          tagText: "👑 CASA KITTY",
+          tagColor: "#fef08a",
+          tagBg: "rgba(234, 179, 8, 0.28)",
+          nameColor: "#fef08a"
+        };
+      }
+      if (n.includes("hub") || n.includes("antigravity")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(14, 165, 233, 0.24) 0%, rgba(59, 130, 246, 0.28) 100%)",
+          border: "rgba(56, 189, 248, 0.6)",
+          glow: "0 8px 24px rgba(14, 165, 233, 0.28)",
+          avatarBg: "linear-gradient(135deg, #00f2fe 0%, #3b82f6 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "⚡",
+          tagText: "⚡ ANTIGRAVITY",
+          tagColor: "#38bdf8",
+          tagBg: "rgba(14, 165, 233, 0.28)",
+          nameColor: "#e0f2fe"
+        };
+      }
+      if (n.includes("vampira")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(225, 29, 72, 0.26) 0%, rgba(136, 19, 55, 0.35) 100%)",
+          border: "rgba(244, 63, 94, 0.6)",
+          glow: "0 8px 24px rgba(225, 29, 72, 0.3)",
+          avatarBg: "linear-gradient(135deg, #f43f5e 0%, #881337 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "🌹",
+          tagText: "🌹 VAMPIRA",
+          tagColor: "#fda4af",
+          tagBg: "rgba(225, 29, 72, 0.28)",
+          nameColor: "#ffe4e6"
+        };
+      }
+      if (n.includes("upload") || n.includes("telefon")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(16, 185, 129, 0.24) 0%, rgba(5, 150, 105, 0.3) 100%)",
+          border: "rgba(52, 211, 153, 0.6)",
+          glow: "0 8px 24px rgba(16, 185, 129, 0.28)",
+          avatarBg: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "📱",
+          tagText: "📱 MOBIL UPLOAD",
+          tagColor: "#6ee7b7",
+          tagBg: "rgba(16, 185, 129, 0.28)",
+          nameColor: "#d1fae5"
+        };
+      }
+      if (n.includes("pulsedeck") || n.includes("playerdj") || n.includes("muzica") || n.includes("music")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(126, 34, 206, 0.32) 100%)",
+          border: "rgba(192, 132, 252, 0.6)",
+          glow: "0 8px 24px rgba(168, 85, 247, 0.28)",
+          avatarBg: "linear-gradient(135deg, #a855f7 0%, #6366f1 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "🎧",
+          tagText: "🎧 DJ PULSE",
+          tagColor: "#e9d5ff",
+          tagBg: "rgba(168, 85, 247, 0.28)",
+          nameColor: "#f3e8ff"
+        };
+      }
+      if (n.includes("fatty bob")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(236, 72, 153, 0.24) 0%, rgba(219, 39, 119, 0.3) 100%)",
+          border: "rgba(244, 114, 182, 0.6)",
+          glow: "0 8px 24px rgba(236, 72, 153, 0.28)",
+          avatarBg: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "🎨",
+          tagText: "🎨 FATTY BOB",
+          tagColor: "#fbcfe8",
+          tagBg: "rgba(236, 72, 153, 0.28)",
+          nameColor: "#fdf2f8"
+        };
+      }
+      if (n.includes("apk") || n.includes("consola")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(249, 115, 22, 0.24) 0%, rgba(234, 88, 12, 0.3) 100%)",
+          border: "rgba(251, 146, 60, 0.6)",
+          glow: "0 8px 24px rgba(249, 115, 22, 0.28)",
+          avatarBg: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "🎮",
+          tagText: "🎮 CONSOLĂ APK",
+          tagColor: "#fed7aa",
+          tagBg: "rgba(249, 115, 22, 0.28)",
+          nameColor: "#ffedd5"
+        };
+      }
+      if (n.includes("server") || n.includes("telemetrie") || n.includes("python")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(20, 184, 166, 0.24) 0%, rgba(13, 148, 136, 0.3) 100%)",
+          border: "rgba(45, 212, 191, 0.6)",
+          glow: "0 8px 24px rgba(20, 184, 166, 0.28)",
+          avatarBg: "linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "🎛️",
+          tagText: "🎛️ PYTHON CORE",
+          tagColor: "#99f6e4",
+          tagBg: "rgba(20, 184, 166, 0.28)",
+          nameColor: "#ccfbf1"
+        };
+      }
+      if (item.type === "drive" || n.includes("partiția") || n.includes("partitia")) {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(99, 102, 241, 0.24) 0%, rgba(67, 56, 202, 0.32) 100%)",
+          border: "rgba(129, 140, 248, 0.6)",
+          glow: "0 8px 24px rgba(99, 102, 241, 0.28)",
+          avatarBg: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.45)",
+          icon: item.icon || "💾",
+          tagText: "💾 PARTIȚIE HDD",
+          tagColor: "#c7d2fe",
+          tagBg: "rgba(99, 102, 241, 0.28)",
+          nameColor: "#e0e7ff"
+        };
+      }
+      if (item.type === "shortcut" || n === "desktop" || n === "downloads" || n === "documents" || n === "pictures") {
+        return {
+          cardBg: "linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(37, 99, 235, 0.28) 100%)",
+          border: "rgba(96, 165, 250, 0.55)",
+          glow: "0 8px 22px rgba(59, 130, 246, 0.24)",
+          avatarBg: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+          avatarBorder: "rgba(255, 255, 255, 0.4)",
+          icon: item.icon || "📁",
+          tagText: "📁 SISTEM",
+          tagColor: "#bfdbfe",
+          tagBg: "rgba(59, 130, 246, 0.28)",
+          nameColor: "#dbeafe"
+        };
+      }
+      // Generic folder: Rich Glowing Gold / Amber
+      return {
+        cardBg: "linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.26) 100%)",
+        border: "rgba(251, 191, 36, 0.52)",
+        glow: "0 8px 22px rgba(245, 158, 11, 0.22)",
+        avatarBg: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+        avatarBorder: "rgba(255, 255, 255, 0.4)",
+        icon: item.icon || "📁",
+        tagText: "📁 DOSAR",
+        tagColor: "#fde68a",
+        tagBg: "rgba(245, 158, 11, 0.25)",
+        nameColor: "#fef3c7"
+      };
+    }
+
+    // File extensions
+    const ext = (item.name || "").split(".").pop().toLowerCase();
+    if (ext === "apk") {
+      return {
+        cardBg: "linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(21, 128, 61, 0.24) 100%)",
+        border: "rgba(74, 222, 128, 0.5)",
+        glow: "0 6px 20px rgba(34, 197, 94, 0.2)",
+        avatarBg: "linear-gradient(135deg, #22c55e 0%, #15803d 100%)",
+        avatarBorder: "rgba(255, 255, 255, 0.35)",
+        icon: "🤖",
+        tagText: "🤖 APK ANDROID",
+        tagColor: "#bbf7d0",
+        tagBg: "rgba(34, 197, 94, 0.22)",
+        nameColor: "#f0fdf4"
+      };
+    }
+    if (["mp3", "wav", "flac", "m4a"].includes(ext)) {
+      return {
+        cardBg: "linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(126, 34, 206, 0.24) 100%)",
+        border: "rgba(192, 132, 252, 0.5)",
+        glow: "0 6px 20px rgba(168, 85, 247, 0.2)",
+        avatarBg: "linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)",
+        avatarBorder: "rgba(255, 255, 255, 0.35)",
+        icon: "🎵",
+        tagText: "🎵 AUDIO MP3",
+        tagColor: "#e9d5ff",
+        tagBg: "rgba(168, 85, 247, 0.22)",
+        nameColor: "#faf5ff"
+      };
+    }
+    if (["mp4", "mkv", "avi", "mov"].includes(ext)) {
+      return {
+        cardBg: "linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.24) 100%)",
+        border: "rgba(248, 113, 113, 0.5)",
+        glow: "0 6px 20px rgba(239, 68, 68, 0.2)",
+        avatarBg: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+        avatarBorder: "rgba(255, 255, 255, 0.35)",
+        icon: "🎬",
+        tagText: "🎬 VIDEO",
+        tagColor: "#fecaca",
+        tagBg: "rgba(239, 68, 68, 0.22)",
+        nameColor: "#fef2f2"
+      };
+    }
+    if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
+      return {
+        cardBg: "linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(14, 116, 144, 0.24) 100%)",
+        border: "rgba(34, 211, 238, 0.5)",
+        glow: "0 6px 20px rgba(6, 182, 212, 0.2)",
+        avatarBg: "linear-gradient(135deg, #06b6d4 0%, #0e7490 100%)",
+        avatarBorder: "rgba(255, 255, 255, 0.35)",
+        icon: "🖼️",
+        tagText: "🖼️ IMAGINE",
+        tagColor: "#a5f3fc",
+        tagBg: "rgba(6, 182, 212, 0.22)",
+        nameColor: "#ecfeff"
+      };
+    }
+    if (["py", "js", "html", "css", "json", "ts"].includes(ext)) {
+      return {
+        cardBg: "linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(29, 78, 216, 0.24) 100%)",
+        border: "rgba(96, 165, 250, 0.5)",
+        glow: "0 6px 20px rgba(59, 130, 246, 0.2)",
+        avatarBg: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+        avatarBorder: "rgba(255, 255, 255, 0.35)",
+        icon: "💻",
+        tagText: `💻 COD .${ext.toUpperCase()}`,
+        tagColor: "#bfdbfe",
+        tagBg: "rgba(59, 130, 246, 0.22)",
+        nameColor: "#eff6ff"
+      };
+    }
+    return {
+      cardBg: "rgba(15, 20, 42, 0.75)",
+      border: "rgba(255, 255, 255, 0.12)",
+      glow: "0 4px 16px rgba(0, 0, 0, 0.4)",
+      avatarBg: "linear-gradient(135deg, rgba(51, 65, 85, 0.8), rgba(30, 41, 59, 0.9))",
+      avatarBorder: "rgba(255, 255, 255, 0.2)",
+      icon: item.icon || "📄",
+      tagText: "📄 FIȘIER",
+      tagColor: "#94a3b8",
+      tagBg: "rgba(255, 255, 255, 0.08)",
+      nameColor: "#ffffff"
+    };
+  }
+
+  function renderExplorerItems(items) {
+    const container = document.getElementById("fsContainer");
+    container.innerHTML = "";
+
+    if (!items || items.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-dim); font-size:12px;">Dosar gol</div>`;
+      return;
+    }
+
+    items.forEach(item => {
+      const isDir = item.is_dir || item.type === "shortcut" || item.type === "drive";
+      const theme = getItemVisualTheme(item);
+
+      const card = document.createElement("div");
+      card.className = `file-node-3d ${isDir ? 'folder-card-glow' : ''}`;
+      card.style.background = theme.cardBg;
+      card.style.borderColor = theme.border;
+      card.style.boxShadow = theme.glow;
+      if (isDir) {
+        card.style.cursor = "pointer";
+      }
+
+      const left = document.createElement("div");
+      left.className = "file-left-node";
+      left.innerHTML = `
+        <div class="file-avatar-box" style="background:${theme.avatarBg}; border-color:${theme.avatarBorder};">
+          ${theme.icon}
+        </div>
+        <div class="file-specs">
+          <div class="file-headline" style="color:${theme.nameColor}; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span>${item.name}</span>
+            <span style="font-size:8.5px; font-weight:800; padding:1.5px 6px; border-radius:8px; background:${theme.tagBg}; color:${theme.tagColor}; border:1px solid ${theme.border}; text-transform:uppercase; letter-spacing:0.4px;">${theme.tagText}</span>
+          </div>
+          <div class="file-subtext">${isDir ? "Dosar PC" : item.size} ${item.modified ? "• " + item.modified : ""}</div>
+        </div>
+      `;
+
+      if (isDir) {
+        card.onclick = () => { triggerHaptic(25); openDirectory(item.path); };
+
+        const folderEnter = document.createElement("div");
+        folderEnter.className = "folder-enter-pill";
+        folderEnter.style.color = theme.tagColor;
+        folderEnter.style.borderColor = theme.border;
+        folderEnter.style.background = theme.tagBg;
+        folderEnter.innerHTML = `<span>DESCHIDE</span> <span style="font-size:13px; font-weight:900;">›</span>`;
+
+        card.appendChild(left);
+        card.appendChild(folderEnter);
+      } else {
+        const actions = document.createElement("div");
+        actions.className = "file-actions-row";
+
+        const btnOpen = document.createElement("button");
+        btnOpen.className = "btn-3d-pill open-pc";
+        btnOpen.innerHTML = "⚡ PC";
+        btnOpen.title = "Deschide pe ecranul PC-ului";
+        btnOpen.onclick = (e) => { e.stopPropagation(); openOnPcScreen(item.path); };
+
+        const btnDl = document.createElement("button");
+        btnDl.className = "btn-3d-pill down-mob";
+        btnDl.innerHTML = "⬇️ MOBIL";
+        btnDl.title = "Descarcă pe telefon";
+        btnDl.onclick = (e) => { e.stopPropagation(); downloadFileToMobile(item.path); };
+
+        actions.appendChild(btnOpen);
+        actions.appendChild(btnDl);
+
+        card.appendChild(left);
+        card.appendChild(actions);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  function filterExplorerItems(keyword) {
+    const term = keyword.toLowerCase().trim();
+    if (!term) {
+      renderExplorerItems(cachedExplorerItems);
+      return;
+    }
+    const filtered = cachedExplorerItems.filter(i => i.name.toLowerCase().includes(term));
+    renderExplorerItems(filtered);
+  }
+
+  function navigateParent() {
+    triggerHaptic(20);
+    if (parentDirectoryPath) openDirectory(parentDirectoryPath);
+    else openDirectory("roots");
+  }
+
+  async function openOnPcScreen(path) {
+    triggerHaptic(30);
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/fs/open`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: path })
+      });
+      const data = await res.json();
+      if (data.status === "opened") triggerToast("⚡ Deschis pe ecranul PC-ului!");
+      else triggerToast("Eroare: " + (data.error || "Fișier blocat"));
+    } catch(e) {
+      triggerToast("Eroare comunicare cu PC");
+    }
+  }
+
+  function downloadFileToMobile(path) {
+    triggerHaptic(30);
+    triggerToast("⬇️ Descărcare inițiată...");
+    window.open(`${serverBaseUrl}/api/fs/download?path=${encodeURIComponent(path)}`, "_blank");
+  }
+
+  // ================= CONSOLE & COMMANDS =================
+  async function refreshTelemetry() {
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/status`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById("valRam").textContent = `${data.used_ram_pct}%`;
+        document.getElementById("valDisk").textContent = `${data.free_disk_gb} GB`;
+        document.getElementById("valHost").textContent = data.hostname || "PC";
+      }
+    } catch(e) {}
+  }
+
+  async function execPcCommand(cmd) {
+    triggerHaptic(35);
+    triggerToast("Executare pe PC...");
+    try {
+      const res = await fetch(`${serverBaseUrl}/api/command`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: cmd })
+      });
+      const data = await res.json();
+      triggerToast("✅ " + (data.output || "Comandă executată"));
+    } catch(e) {
+      triggerToast("Eroare execuție comandă");
+    }
+  }
+
+  // ================= OTA AUTO-SYNC ENGINE =================
+  let latestOtaData = null;
+
+  async function checkOtaUpdate(manual = false) {
+    if (manual) triggerHaptic(25);
+    // Neutralizează orice banner de instalare existent
+    const banner = document.getElementById("otaLiveBanner");
+    if (banner) banner.remove();
+
+    const otaBadge = document.getElementById("otaLabel");
+    if (otaBadge) {
+      otaBadge.textContent = "OTA LA ZI ✓";
+      otaBadge.style.color = "var(--neon-emerald)";
+    }
+    if (manual) triggerToast("✅ Aplicația este sincronizată instantaneu prin OTA!");
+  }
+
+  function showOtaUpdateBanner(data) {
+    // Dezactivat complet: fără popup-uri de instalare APK
+    const banner = document.getElementById("otaLiveBanner");
+    if (banner) banner.remove();
+  }
+
+  function startOtaInstall() {
+    triggerHaptic(35);
+    const targetUrl = (latestOtaData && latestOtaData.apk_url) ? latestOtaData.apk_url : `${serverBaseUrl}/kitty-nexus-2026.apk`;
+    triggerToast("🚀 Actualizare OTA în curs de descărcare...");
+    if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallApk) {
+      window.AndroidBridge.downloadAndInstallApk(targetUrl);
+    } else {
+      window.location.href = targetUrl;
+    }
+  }
+
+  function downloadLatestApk() {
+    triggerHaptic(30);
+    triggerToast("⬇️ Descărcare APK inițiată...");
+    startOtaInstall();
+  }
+
+  function getAntigravityUrl() {
+    if (window.location.protocol === "https:" || window.location.hostname.includes("trycloudflare.com")) {
+      return `${serverBaseUrl}/agy/`;
+    }
+    const host = window.location.hostname;
+    if (host && host !== "localhost" && host !== "127.0.0.1" && !host.startsWith("file")) {
+      return `http://${host}:9999/`;
+    }
+    return "http://100.103.33.115:9999/";
+  }
+
+  function initAgyFrame() {
+    const frame = document.getElementById("agyFrame");
+    if (!frame) return;
+    const targetUrl = getAntigravityUrl();
+    if (!frame.src || frame.src === "about:blank" || frame.src.endsWith("about:blank")) {
+      frame.src = targetUrl;
+    }
+  }
+
+  function reloadAgyFrame() {
+    triggerHaptic(25);
+    const frame = document.getElementById("agyFrame");
+    if (frame) {
+      const base = getAntigravityUrl();
+      frame.src = base + (base.includes("?") ? "&" : "?") + "t=" + Date.now();
+      triggerToast("🔄 Reîncărcare Antigravity...");
+    }
+  }
+
+  function openAntigravityDirect() {
+    triggerHaptic(35);
+    const dockBtn = document.getElementById("dockBtnAgy");
+    switchDock("viewAntigravity", dockBtn);
+    initAgyFrame();
+    triggerToast("👑 Comutat la Antigravity Direct!");
+  }
+
+  async function syncVoiceTargetFromServer() {
+    try {
+      const r = await fetch(`${serverBaseUrl}/api/voice/target`, { cache: "no-store" });
+      if (r.ok) {
+        const d = await r.json();
+        if (d.target === "mute") {
+          phoneVoiceOn = false;
+          pcVoiceOn = false;
+        } else if (d.target === "pc") {
+          pcVoiceOn = true;
+          phoneVoiceOn = false;
+        } else if (d.target === "phone") {
+          phoneVoiceOn = true;
+          pcVoiceOn = false;
+        }
+        localStorage.setItem("zenesis_phone_voice", phoneVoiceOn);
+        localStorage.setItem("zenesis_pc_voice", pcVoiceOn);
+        updateVoiceButtonsUI();
+      }
+    } catch(e) {}
+  }
+
+  // Startup Init
+  window.addEventListener("DOMContentLoaded", () => {
+    updateVoiceButtonsUI();
+    autoDetectAndConnect();
+    syncVoiceTargetFromServer();
+    syncChatHistoryLog();
+    initSSEStream();
+    setInterval(syncChatHistoryLog, 2000); // Continuous 2s sync fallback for mobile
+    // Check if agent is currently working on PC
+    setTimeout(async () => {
+      try {
+        const r = await fetch(`${serverBaseUrl}/api/agent/live_action`, { cache: "no-store" });
+        if (r.ok) {
+          const d = await r.json();
+          if (d.working || d.active) updateWorkingActions(d);
+        }
+      } catch(e) {}
+    }, 800);
+    setInterval(refreshTelemetry, 5000);
+    setTimeout(() => checkOtaUpdate(false), 2000);
+    setInterval(() => checkOtaUpdate(false), 30000);
+  });
+</script>
+</body>
+</html>
