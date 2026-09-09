@@ -722,6 +722,47 @@
     100% { transform: scale(1); }
   }
 
+  /* AI Model Modal Cards */
+  .model-opt-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .model-opt-card:hover, .model-opt-card:active {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: #c084fc;
+    transform: translateY(-1px);
+  }
+  .model-opt-card.active-model {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.25));
+    border-color: #38bdf8;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+  }
+  .model-check-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+  }
+  .model-opt-card.active-model .model-check-badge {
+    background: #38bdf8;
+    color: #05070f;
+    box-shadow: 0 0 10px #38bdf8;
+  }
+
   /* ================= VIEW 2: EXPLORER ================= */
   .explorer-hud-top {
     width: 100%;
@@ -1435,7 +1476,82 @@
       </div>
     </div>
 
-  
+    <!-- Modal Selector Modele AI & Agenți -->
+    <div id="aiModelModal" style="display:none; position:fixed; top:50px; left:50%; transform:translateX(-50%); width:92%; max-width:370px; background:rgba(10, 14, 28, 0.97); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); border:1.5px solid rgba(168, 85, 247, 0.5); border-radius:20px; padding:14px; z-index:99999; box-shadow:0 14px 45px rgba(0,0,0,0.95);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🧠</span>
+          <div>
+            <div style="font-size:12px; font-weight:900; color:#fff; letter-spacing:0.5px;">ALEGE MODELUL DE INTELIGENȚĂ</div>
+            <div style="font-size:9px; color:#c084fc; font-weight:700;">AGENTUL CU CARE LUCREAZĂ KITTY</div>
+          </div>
+        </div>
+        <button class="btn-3d-chip" onclick="toggleAiModelModal()" style="border-radius:50%; width:26px; height:26px; padding:0; justify-content:center; font-size:12px; color:#f43f5e; border-color:#f43f5e;">✕</button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <!-- Gemini 3.6 Flash / Default -->
+        <div class="model-opt-card" id="card_gemini-3.6-flash" onclick="selectAiModel('gemini-3.6-flash', 'Gemini 3.6 Flash')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">⚡</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#38bdf8;">Gemini 3.6 Flash</div>
+              <div style="font-size:9.5px; color:#94a3b8;">Ultra-rapid, 0 delay, inteligență nativă Google 2026</div>
+            </div>
+          </div>
+          <span class="model-check-badge" id="check_gemini-3.6-flash">✔</span>
+        </div>
+
+        <!-- ChatGPT / GPT-4o -->
+        <div class="model-opt-card" id="card_chatgpt-4o" onclick="selectAiModel('chatgpt-4o', 'ChatGPT (GPT-4o)')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">🟢</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#10b981;">ChatGPT (GPT-4o)</div>
+              <div style="font-size:9.5px; color:#94a3b8;">OpenAI Neural Engine & logică de cod avansată</div>
+            </div>
+          </div>
+          <span class="model-check-badge" id="check_chatgpt-4o"></span>
+        </div>
+
+        <!-- Claude 3.8 / Sonnet -->
+        <div class="model-opt-card" id="card_claude-3.8" onclick="selectAiModel('claude-3.8', 'Claude 3.8 Sonnet')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">🟣</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#c084fc;">Claude 3.8 (Anthropic)</div>
+              <div style="font-size:9.5px; color:#94a3b8;">Raționament profund, cod pur, arhitectură fină</div>
+            </div>
+          </div>
+          <span class="model-check-badge" id="check_claude-3.8"></span>
+        </div>
+
+        <!-- Google Antigravity Agent -->
+        <div class="model-opt-card" id="card_antigravity-agent" onclick="selectAiModel('antigravity-agent', 'Google Antigravity Agent')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">👑</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fbbf24;">Google Antigravity Agent</div>
+              <div style="font-size:9.5px; color:#94a3b8;">Control direct PC, execuție comenzi locale & fișiere</div>
+            </div>
+          </div>
+          <span class="model-check-badge" id="check_antigravity-agent"></span>
+        </div>
+
+        <!-- Gemini 3.1 Flash Lite -->
+        <div class="model-opt-card" id="card_gemini-3.1-flash-lite" onclick="selectAiModel('gemini-3.1-flash-lite', 'Gemini 3.1 Flash Lite')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">💎</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#34d399;">Gemini 3.1 Flash Lite</div>
+              <div style="font-size:9.5px; color:#94a3b8;">Consum minim, răspunsuri instantanee pentru mobil</div>
+            </div>
+          </div>
+          <span class="model-check-badge" id="check_gemini-3.1-flash-lite"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- VIEW 5: DEDICATED CHATGPT TAB (LOGAT SEPARAT) -->
     <div id="viewChatGPT" class="view-deck" style="padding:16px; overflow-y:auto; position:relative; flex-direction:column; gap:14px; background:radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.15), transparent 70%), #05070f;">
       <div style="background:rgba(14, 20, 40, 0.85); border:1px solid rgba(16, 185, 129, 0.4); border-radius:18px; padding:22px 16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px;">
@@ -1493,9 +1609,9 @@
       <span class="dock-icon">🟢</span>
       <span>ChatGPT</span>
     </button>
-    <button class="dock-pod-btn" id="dockBtnAgy" onclick="switchDock('viewAntigravity', this); initAgyFrame();">
-      <span class="dock-icon">👑</span>
-      <span>Antigravity</span>
+    <button class="dock-pod-btn" id="dockBtnAiModel" onclick="toggleAiModelModal()">
+      <span class="dock-icon">🧠</span>
+      <span id="dockModelLabel">Model AI</span>
     </button>
     <button class="dock-pod-btn" id="dockBtnExplorer" onclick="switchDock('viewExplorer', this); openDirectory();">
       <span class="dock-icon">🗂️</span>
@@ -2836,6 +2952,78 @@
     }
   }
 
+  // 2.9 AI Model & Agent Controller
+  let currentSelectedAiModel = "gemini-3.6-flash";
+
+  function toggleAiModelModal() {
+    triggerHaptic(25);
+    const modal = document.getElementById("aiModelModal");
+    if (!modal) return;
+    const isShowing = modal.style.display !== "none" && modal.style.display !== "";
+    modal.style.display = isShowing ? "none" : "block";
+  }
+
+  function updateAiModelUI(modelId) {
+    currentSelectedAiModel = modelId;
+    const cards = document.querySelectorAll(".model-opt-card");
+    cards.forEach(c => c.classList.remove("active-model"));
+    const badges = document.querySelectorAll(".model-check-badge");
+    badges.forEach(b => b.textContent = "");
+
+    const activeCard = document.getElementById("card_" + modelId);
+    if (activeCard) activeCard.classList.add("active-model");
+    const activeBadge = document.getElementById("check_" + modelId);
+    if (activeBadge) activeBadge.textContent = "✔";
+
+    const label = document.getElementById("dockModelLabel");
+    if (label) {
+      if (modelId.includes("chatgpt") || modelId.includes("gpt")) label.textContent = "ChatGPT";
+      else if (modelId.includes("claude")) label.textContent = "Claude";
+      else if (modelId.includes("antigravity")) label.textContent = "Agent AGY";
+      else if (modelId.includes("lite")) label.textContent = "Gemini Lite";
+      else label.textContent = "Gemini 3.6";
+    }
+  }
+
+  async function selectAiModel(modelId, modelFriendlyName) {
+    triggerHaptic(40, "action");
+    updateAiModelUI(modelId);
+    localStorage.setItem("zenesis_ai_model", modelId);
+    triggerToast(`🧠 Agent activat: ${modelFriendlyName}`);
+    
+    // Închide modalul după selectare
+    setTimeout(() => {
+      const modal = document.getElementById("aiModelModal");
+      if (modal) modal.style.display = "none";
+    }, 280);
+
+    // Salvează și pe PC Server
+    try {
+      const targetUrl = serverBaseUrl || FIXED_CLOUDFLARE_URL;
+      await fetch(`${targetUrl}/api/ai/model`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: modelId })
+      });
+    } catch(e) {}
+  }
+
+  async function syncAiModelFromServer() {
+    const saved = localStorage.getItem("zenesis_ai_model") || "gemini-3.6-flash";
+    updateAiModelUI(saved);
+    try {
+      const targetUrl = serverBaseUrl || FIXED_CLOUDFLARE_URL;
+      const r = await fetch(`${targetUrl}/api/ai/model`, { cache: "no-store" });
+      if (r.ok) {
+        const d = await r.json();
+        if (d.model) {
+          localStorage.setItem("zenesis_ai_model", d.model);
+          updateAiModelUI(d.model);
+        }
+      }
+    } catch(e) {}
+  }
+
   // 3. DJ Media Controller
   function toggleDjModal() {
     triggerHaptic(25);
@@ -3690,6 +3878,7 @@
   // Startup Init
   window.addEventListener("DOMContentLoaded", () => {
     updateVoiceButtonsUI();
+    syncAiModelFromServer();
     autoDetectAndConnect();
     syncVoiceTargetFromServer();
     syncChatHistoryLog();
