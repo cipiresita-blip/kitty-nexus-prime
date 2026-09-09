@@ -1171,6 +1171,7 @@
     <!-- VIEW 1: 3D CHAT -->
     <div id="viewChat" class="view-deck active">
       <div class="chips-dock">
+        <button class="btn-3d-chip" style="background:linear-gradient(180deg, #10b981 0%, #047857 100%); border-color:#34d399; color:#fff; font-weight:800;" onclick="openChatGPTDirect()">🟢 CHATGPT LOGAT</button>
         <button class="btn-3d-chip" style="background:linear-gradient(180deg, #0284c7 0%, #00f2fe 100%); border-color:#38bdf8; color:#fff; font-weight:800;" onclick="triggerForgeBuilder()">🔨 FORGE SITE AI</button>
         <button class="btn-3d-chip" style="background:linear-gradient(180deg, #ec4899 0%, #be185d 100%); border-color:#f472b6; color:#fff; font-weight:800;" onclick="open3DVisualizer()">🎵 VIZUALIZATOR 3D</button>
         <button class="btn-3d-chip" style="background:linear-gradient(180deg, #10b981 0%, #047857 100%); border-color:#34d399; color:#fff; font-weight:800;" onclick="checkSentinelShield()">🛡️ SENTINEL PAZĂ</button>
@@ -1377,6 +1378,25 @@
       </div>
     </div>
 
+  
+    <!-- VIEW 5: DEDICATED CHATGPT TAB (LOGAT SEPARAT) -->
+    <div id="viewChatGPT" class="view-deck" style="padding:0; overflow:hidden; position:relative; flex-direction:column;">
+      <div style="height:42px; min-height:42px; background:rgba(10, 15, 32, 0.96); border-bottom:1px solid rgba(16, 185, 129, 0.4); display:flex; align-items:center; justify-content:space-between; padding:0 12px; z-index:10; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:17px;">🟢</span>
+          <div>
+            <div style="font-size:11px; font-weight:900; color:#10b981; letter-spacing:0.4px;">CHATGPT PRO // OPENAI DIRECT</div>
+            <div style="font-size:8.5px; color:#94a3b8; font-weight:700;">CONTUL TĂU LOGAT // ACCES TOTAL</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-3d btn-3d-emerald" style="padding:4px 9px; font-size:9.5px;" onclick="openExternalChatGPT()">↗️ DESCHIDE TAB</button>
+          <button class="btn-3d btn-3d-cyan" style="padding:4px 9px; font-size:9.5px;" onclick="reloadGptFrame()">🔄 REÎNCARCĂ</button>
+        </div>
+      </div>
+      <iframe id="gptFrame" src="about:blank" style="width:100%; flex:1; border:none; background:#0f172a;" allow="clipboard-read; clipboard-write; microphone"></iframe>
+    </div>
+
   </main>
 
   <!-- 3D Cyber Dock -->
@@ -1384,6 +1404,10 @@
     <button class="dock-pod-btn active" id="dockBtnChat" onclick="switchDock('viewChat', this)">
       <span class="dock-icon">💬</span>
       <span>Chat Live</span>
+    </button>
+    <button class="dock-pod-btn" id="dockBtnChatGPT" onclick="switchDock('viewChatGPT', this); initGptFrame();">
+      <span class="dock-icon">🟢</span>
+      <span>ChatGPT</span>
     </button>
     <button class="dock-pod-btn" id="dockBtnAgy" onclick="switchDock('viewAntigravity', this); initAgyFrame();">
       <span class="dock-icon">👑</span>
@@ -3328,6 +3352,41 @@
       frame.src = base + (base.includes("?") ? "&" : "?") + "t=" + Date.now();
       triggerToast("🔄 Reîncărcare Antigravity...");
     }
+  }
+
+  
+  // ================= DEDICATED CHATGPT CONTROLLER =================
+  const CHATGPT_WEB_URL = "https://chatgpt.com";
+
+  function initGptFrame() {
+    const frame = document.getElementById("gptFrame");
+    if (!frame) return;
+    if (!frame.src || frame.src === "about:blank" || frame.src.endsWith("about:blank")) {
+      frame.src = CHATGPT_WEB_URL;
+    }
+  }
+
+  function reloadGptFrame() {
+    triggerHaptic(25);
+    const frame = document.getElementById("gptFrame");
+    if (frame) {
+      frame.src = CHATGPT_WEB_URL;
+      triggerToast("🔄 Reîncărcare ChatGPT...");
+    }
+  }
+
+  function openExternalChatGPT() {
+    triggerHaptic(30);
+    window.open(CHATGPT_WEB_URL, "_blank");
+    triggerToast("↗️ Deschis ChatGPT Logat!");
+  }
+
+  function openChatGPTDirect() {
+    triggerHaptic(35);
+    const dockBtn = document.getElementById("dockBtnChatGPT");
+    switchDock("viewChatGPT", dockBtn);
+    initGptFrame();
+    triggerToast("🟢 Comutat la ChatGPT!");
   }
 
   function openAntigravityDirect() {
